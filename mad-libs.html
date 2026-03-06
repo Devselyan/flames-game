@@ -196,7 +196,8 @@ I took a bite and immediately reached for my glass of **{liquid}**. Let's just s
                     { label: "Type of Animal", id: "animal" },
                     { label: "Famous Person", id: "celebrity" },
                     { label: "Food", id: "food1" },
-                    { label: "Exclamation", id: "exclaim" }
+                    { label: "Exclamation", id: "exclaim" },
+                    { label: "Number", id: "number" }
                 ],
                 template: `Welcome to the most **{adj1}** theme park in the world! I was so excited to try the new roller coaster that I ate **{number}** **{food1}**s for breakfast.
 
@@ -224,7 +225,7 @@ As we boarded, I felt my **{bodypart}** start to shake. The ride began **{verb1}
 
 On day one, I tried to **{verb1}** on the beach, but a wild **{animal}** stole my sunscreen and ran away! I chased it using only my **{bodypart}** to dig through the sand.
 
-Exhausted, I stopped at a food stand and ordered some **{food1}**. The vendor looked at me and said, "**{exclaim}**! That'll be ${number} please!"
+Exhausted, I stopped at a food stand and ordered some **{food1}**. The vendor looked at me and said, "**{exclaim}**! That'll be **{number}** please!"
 
 I went home with a sunburn, no money, and a story I'll never forget!`
             },
@@ -312,7 +313,7 @@ Best concert ever! I sang along to all **{number}** songs, even though I only kn
 
             document.getElementById('inputsSection').classList.remove('active');
             document.getElementById('resultSection').classList.add('active');
-            document.getElementById('storyResult').innerHTML = resultText.replace(/\{number\}/g, '<span class="filled-word">3</span>');
+            document.getElementById('storyResult').innerHTML = resultText;
         }
 
         function copyStory() {
