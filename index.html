@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLAMES Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            border-radius: 15px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .flames-letters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .flame-letter {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: #ddd;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .flame-letter.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .flame-letter.eliminated {
+            background: #ccc;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .flame-letter.counting {
+            background: #ffeb3b;
+            color: #333;
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(255, 235, 59, 0.8);
+        }
+
+        .result-title {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .count-display {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .step-counter {
+            font-size: 1.2rem;
+            color: #764ba2;
+            font-weight: bold;
+            margin-bottom: 15px;
+            min-height: 30px;
+        }
+
+        .heart {
+            color: #e91e63;
+            font-size: 1.5rem;
+        }
+
+        /* Confetti styles */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: confetti-fall 3s ease-out forwards;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        /* Particle sparkles */
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #fff 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle-anim 1s ease-out forwards;
+        }
+
+        @keyframes sparkle-anim {
+            0% {
+                opacity: 1;
+                transform: scale(0) translate(0, 0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) translate(var(--tx), var(--ty));
+            }
+        }
+
+        /* Share button */
+        .share-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.4);
+        }
+
+        .share-btn:active {
+            transform: translateY(0);
+        }
+
+        .share-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .share-container.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 FLAMES 🔥</h1>
+        <p class="subtitle">Discover your relationship compatibility</p>
+
+        <div class="input-group">
+            <label for="name1">Your Name</label>
+            <input type="text" id="name1" placeholder="Enter your name">
+        </div>
+
+        <div class="input-group">
+            <label for="name2">Partner's Name</label>
+            <input type="text" id="name2" placeholder="Enter partner's name">
+        </div>
+
+        <button class="btn" onclick="calculateFLAMES()">Check FLAMES</button>
+
+        <div class="result-section" id="resultSection">
+            <div class="step-counter" id="stepCounter"></div>
+
+            <div class="flames-letters" id="flamesLetters">
+                <div class="flame-letter" data-letter="F">F</div>
+                <div class="flame-letter" data-letter="L">L</div>
+                <div class="flame-letter" data-letter="A">A</div>
+                <div class="flame-letter" data-letter="M">M</div>
+                <div class="flame-letter" data-letter="E">E</div>
+                <div class="flame-letter" data-letter="S">S</div>
+            </div>
+
+            <h3 class="result-title">Your Relationship Is</h3>
+            <div class="result-value" id="resultValue"></div>
+            <p class="result-description" id="resultDescription"></p>
+
+            <div class="count-display" id="countDisplay"></div>
+
+            <div class="share-container" id="shareContainer">
+                <button class="share-btn" onclick="shareResult()">
+                    <span>📤</span> Share Result
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const flamesData = {
+            F: { name: 'Friends', description: 'You two are best friends! There\'s a strong bond of friendship and trust between you.' },
+            L: { name: 'Love', description: 'There\'s a strong romantic connection between you two! ❤' },
+            A: { name: 'Affection', description: 'You share deep affection and care for each other. 💕' },
+            M: { name: 'Marriage', description: 'You two are meant for a long-term commitment! 💍' },
+            E: { name: 'Enemy', description: 'You might have some conflicts, but every relationship needs challenges to grow.' },
+            S: { name: 'Siblings', description: 'You share a sibling-like bond filled with love and protection. 👫' }
+        };
+
+        let isAnimating = false;
+        let currentResult = null;
+        let currentName1 = '';
+        let currentName2 = '';
+
+        function calculateFLAMES() {
+            if (isAnimating) return;
+
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+
+            if (!name1 || !name2) {
+                alert('Please enter both names!');
+                return;
+            }
+
+            currentName1 = name1;
+            currentName2 = name2;
+
+            // Remove spaces and special characters
+            const cleanName1 = name1.toLowerCase().replace(/[^a-z]/g, '');
+            const cleanName2 = name2.toLowerCase().replace(/[^a-z]/g, '');
+
+            // Count remaining letters after canceling common ones
+            let count = 0;
+            let name2Chars = cleanName2.split('');
+
+            for (let char of cleanName1) {
+                const index = name2Chars.indexOf(char);
+                if (index !== -1) {
+                    name2Chars.splice(index, 1);
+                } else {
+                    count++;
+                }
+            }
+            count += name2Chars.length;
+
+            if (count === 0) {
+                alert('The names have exactly the same letters! Try different names.');
+                return;
+            }
+
+            isAnimating = true;
+            document.getElementById('resultSection').classList.add('show');
+            
+            // Start the step-by-step animation
+            animateFLAMES(count);
+        }
+
+        function animateFLAMES(count) {
+            let flames = ['F', 'L', 'A', 'M', 'E', 'S'];
+            let eliminated = [];
+            let currentIndex = 0;
+            let currentCount = 0;
+
+            const stepCounter = document.getElementById('stepCounter');
+            const flameLetters = document.querySelectorAll('.flame-letter');
+            
+            // Reset all letters
+            flameLetters.forEach(letter => {
+                letter.classList.remove('active', 'eliminated', 'counting');
+            });
+
+            function highlightStep(activeIndex, remainingFlames) {
+                flameLetters.forEach(letter => {
+                    letter.classList.remove('counting');
+                });
+                
+                if (activeIndex < remainingFlames.length) {
+                    const letter = remainingFlames[activeIndex];
+                    const el = document.querySelector(`.flame-letter[data-letter="${letter}"]`);
+                    if (el) el.classList.add('counting');
+                }
+            }
+
+            function nextStep() {
+                const remainingFlames = flames.filter(f => !eliminated.includes(f));
+                
+                if (remainingFlames.length === 1) {
+                    // Animation complete - show final result
+                    finalizeResult(remainingFlames[0], count, eliminated);
+                    return;
+                }
+
+                // Count step
+                currentCount++;
+                
+                const actualIndex = (currentIndex + currentCount - 1) % remainingFlames.length;
+                highlightStep(actualIndex, remainingFlames);
+                stepCounter.textContent = `Counting: ${currentCount} / ${count}`;
+
+                if (currentCount === count) {
+                    // Eliminate this letter
+                    const letterToEliminate = remainingFlames[actualIndex];
+                    eliminated.push(letterToEliminate);
+                    
+                    const el = document.querySelector(`.flame-letter[data-letter="${letterToEliminate}"]`);
+                    if (el) {
+                        el.classList.remove('counting');
+                        el.classList.add('eliminated');
+                    }
+                    
+                    stepCounter.textContent = `❌ ${letterToEliminate} eliminated!`;
+                    currentIndex = actualIndex;
+                    if (currentIndex >= remainingFlames.length - 1) {
+                        currentIndex = 0;
+                    }
+                    currentCount = 0;
+                    
+                    // Wait before next round
+                    setTimeout(nextStep, 400);
+                } else {
+                    // Continue counting - faster speed
+                    setTimeout(nextStep, 100);
+                }
+            }
+
+            // Start animation after a brief delay
+            setTimeout(nextStep, 300);
+        }
+
+        function finalizeResult(result, count, eliminated) {
+            const stepCounter = document.getElementById('stepCounter');
+            const resultValue = document.getElementById('resultValue');
+            const resultDescription = document.getElementById('resultDescription');
+            const countDisplay = document.getElementById('countDisplay');
+            const shareContainer = document.getElementById('shareContainer');
+            const flameLetters = document.querySelectorAll('.flame-letter');
+
+            // Remove counting highlight from all
+            flameLetters.forEach(letter => {
+                letter.classList.remove('counting');
+            });
+
+            // Highlight the winner with animation
+            const resultEl = document.querySelector(`.flame-letter[data-letter="${result}"]`);
+            if (resultEl) {
+                resultEl.classList.add('active');
+                resultEl.style.transition = 'all 0.5s ease';
+                resultEl.style.transform = 'scale(1.4)';
+                
+                // Create sparkle particles around the winning letter
+                createSparkles(resultEl);
+            }
+
+            // Dramatic pause before revealing result
+            stepCounter.textContent = `🎉 And the result is...`;
+            
+            setTimeout(() => {
+                stepCounter.textContent = `🎉 Final Result:`;
+                resultValue.textContent = flamesData[result].name;
+                resultDescription.textContent = flamesData[result].description;
+                countDisplay.textContent = `Remaining count: ${count} letters`;
+                shareContainer.classList.add('show');
+                
+                // Trigger confetti explosion
+                createConfetti();
+                
+                currentResult = result;
+                isAnimating = false;
+            }, 800);
+        }
+
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff69b4'];
+            const shapes = ['circle', 'square'];
+            
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = -10 + 'px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)] === 'circle' ? '50%' : '0';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Remove after animation
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 20);
+            }
+        }
+
+        function createSparkles(element) {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+                    sparkle.style.left = centerX + 'px';
+                    sparkle.style.top = centerY + 'px';
+                    
+                    const angle = (i / 20) * Math.PI * 2;
+                    const distance = Math.random() * 80 + 40;
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    
+                    sparkle.style.setProperty('--tx', tx + 'px');
+                    sparkle.style.setProperty('--ty', ty + 'px');
+                    
+                    document.body.appendChild(sparkle);
+                    
+                    setTimeout(() => sparkle.remove(), 1000);
+                }, i * 50);
+            }
+        }
+
+        function shareResult() {
+            if (!currentResult) return;
+            
+            const resultText = `🔥 FLAMES Result 🔥\n\n${currentName1} ❤️ ${currentName2}\n\nRelationship: ${flamesData[currentResult].name}\n${flamesData[currentResult].description}\n\nTry it yourself!`;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(resultText).then(() => {
+                const shareBtn = document.querySelector('.share-btn');
+                const originalText = shareBtn.innerHTML;
+                shareBtn.innerHTML = '<span>✅</span> Copied!';
+                shareBtn.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+                
+                setTimeout(() => {
+                    shareBtn.innerHTML = '<span>📤</span> Share Result';
+                    shareBtn.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                alert('Could not copy to clipboard. Please try manually!');
+            });
+        }
+
+        // Allow Enter key to trigger calculation
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateFLAMES();
+            }
+        });
+    </script>
+</body>
+</html>
