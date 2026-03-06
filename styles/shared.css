@@ -1,20 +1,5 @@
-/* CSS Variables for theming */
+/* CSS Variables - Dark Mode Only */
 :root {
-    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --container-bg: #ffffff;
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --input-bg: #ffffff;
-    --input-border: #e0e0e0;
-    --btn-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --card-bg: #f8f8f8;
-    --border-color: #e0e0e0;
-    --shadow: rgba(0, 0, 0, 0.3);
-    --hover-bg: #e0e0e0;
-}
-
-/* Dark mode variables */
-[data-theme="dark"] {
     --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     --container-bg: #1e1e2f;
     --text-primary: #e0e0e0;
@@ -50,36 +35,6 @@ body {
     padding: 40px;
     box-shadow: 0 20px 60px var(--shadow);
     transition: background 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Dark Mode Toggle */
-.theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--container-bg);
-    border: 2px solid var(--input-border);
-    border-radius: 50px;
-    padding: 12px 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-    z-index: 10000;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-.theme-toggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
-}
-
-.theme-toggle:active {
-    transform: scale(0.95);
 }
 
 .back-btn {

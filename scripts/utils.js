@@ -12,12 +12,12 @@ function createConfetti(count = 100) {
         confetti.style.left = Math.random() * 100 + '%';
         confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
         confetti.style.animationDelay = Math.random() * 2 + 's';
-        
+
         // Random shape
         if (Math.random() > 0.5) {
             confetti.style.borderRadius = '50%';
         }
-        
+
         confetti.classList.add('fall', 'spin');
         container.appendChild(confetti);
     }
@@ -26,45 +26,6 @@ function createConfetti(count = 100) {
     setTimeout(() => {
         container.remove();
     }, 5000);
-}
-
-// Theme Toggle
-function initThemeToggle() {
-    // Check for saved theme preference or default to light mode
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-
-    // Create toggle button if it doesn't exist
-    let toggle = document.querySelector('.theme-toggle');
-    if (!toggle) {
-        toggle = document.createElement('button');
-        toggle.className = 'theme-toggle';
-        toggle.innerHTML = '<span>🌙</span><span>Theme</span>';
-        document.body.appendChild(toggle);
-    }
-
-    updateThemeIcon(toggle, savedTheme);
-
-    toggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeIcon(toggle, newTheme);
-        
-        // Add subtle animation
-        document.body.style.transition = 'background 0.3s ease';
-    });
-}
-
-function updateThemeIcon(toggle, theme) {
-    const icon = toggle.querySelector('span:first-child');
-    if (theme === 'dark') {
-        icon.textContent = '☀️';
-    } else {
-        icon.textContent = '🌙';
-    }
 }
 
 // Loading State Utilities
@@ -181,5 +142,5 @@ function transitionScreen(fromId, toId, callback) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    initThemeToggle();
+    // Dark mode is always enabled - no toggle needed
 });

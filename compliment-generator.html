@@ -358,12 +358,6 @@
             </div>
         </div>
 
-        <div class="intensity-container hidden" id="intensityContainer">
-            <span class="intensity-label">🌶️ Intensity:</span>
-            <input type="range" min="1" max="3" value="2" class="intensity-slider" id="intensitySlider" oninput="updateIntensity()">
-            <span class="intensity-value medium" id="intensityValue">Medium</span>
-        </div>
-
         <label style="font-weight: 600; color: #333; display: block; margin-bottom: 10px;">Choose Category:</label>
         <div class="category-scroll">
             <div class="category-selector">
@@ -405,7 +399,6 @@
     <script>
         let currentCategory = 'general';
         let isRoastMode = false;
-        let roastIntensity = 2; // 1 = mild, 2 = medium, 3 = savage
         let compliments = {};
         let roasts = {};
         let dataLoaded = false;
@@ -444,20 +437,17 @@
             isRoastMode = !isRoastMode;
             const toggle = document.getElementById('roastToggle');
             const card = document.getElementById('complimentCard');
-            const intensityContainer = document.getElementById('intensityContainer');
             const categoryBtns = document.querySelectorAll('.category-btn');
             
             if (isRoastMode) {
                 toggle.classList.add('active');
                 card.classList.add('roast-mode');
-                intensityContainer.classList.remove('hidden');
                 categoryBtns.forEach(btn => btn.classList.add('roast-active'));
                 document.querySelector('h1').textContent = '🔥 Roast Generator';
                 document.querySelector('.subtitle').textContent = 'Brace yourself for brutal honesty!';
             } else {
                 toggle.classList.remove('active');
                 card.classList.remove('roast-mode');
-                intensityContainer.classList.add('hidden');
                 categoryBtns.forEach(btn => btn.classList.remove('roast-active'));
                 document.querySelector('h1').textContent = '💬 Compliment Generator';
                 document.querySelector('.subtitle').textContent = 'Spread positivity with heartfelt compliments!';
@@ -496,32 +486,8 @@
             card.classList.remove('show');
             
             setTimeout(() => {
-                let sourceData = isRoastMode ? roasts : compliments;
-                let categoryData = sourceData[currentCategory];
-                
-                // Apply intensity filter for roasts
-                if (isRoastMode && categoryData) {
-                    const totalItems = categoryData.length;
-                    let startIndex, endIndex;
-                    
-                    if (roastIntensity === 1) {
-                        // Mild: first 33% of roasts (gentler ones)
-                        startIndex = 0;
-                        endIndex = Math.floor(totalItems * 0.33);
-                    } else if (roastIntensity === 2) {
-                        // Medium: middle 33% of roasts
-                        startIndex = Math.floor(totalItems * 0.33);
-                        endIndex = Math.floor(totalItems * 0.66);
-                    } else {
-                        // Savage: last 34% of roasts (harshest ones)
-                        startIndex = Math.floor(totalItems * 0.66);
-                        endIndex = totalItems;
-                    }
-                    
-                    const filteredRoasts = categoryData.slice(startIndex, endIndex);
-                    categoryData = filteredRoasts.length > 0 ? filteredRoasts : categoryData;
-                }
-                
+                const sourceData = isRoastMode ? roasts : compliments;
+                const categoryData = sourceData[currentCategory];
                 const randomItem = categoryData[Math.floor(Math.random() * categoryData.length)];
 
                 // Replace {name} placeholder with actual name
