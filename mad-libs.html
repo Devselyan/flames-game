@@ -146,278 +146,51 @@
     </div>
 
     <script>
-        let currentStoryIndex = 0;
+        let currentCategoryIndex = 0;
+        let currentStory = null;
+        let allCategories = [];
 
-        const stories = [
-            {
-                title: "The Movie Star",
-                emoji: "🎬",
-                description: "Create a funny story about becoming a famous movie star!",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Another Adjective", id: "adj2" },
-                    { label: "Type of Animal", id: "animal" },
-                    { label: "Famous Person", id: "celebrity" },
-                    { label: "Body Part", id: "bodypart" },
-                    { label: "Verb (ending in -ing)", id: "verb1" },
-                    { label: "Number", id: "number" },
-                    { label: "Food (plural)", id: "food" }
-                ],
-                template: `One day, I was walking down the street when suddenly a **{adj1}** limousine pulled up next to me. Out stepped **{celebrity}**, who said, "You're the most **{adj2}** person I've ever seen! Want to be in my next movie?"
+        // Load stories from JSON file
+        fetch('stories.json')
+            .then(response => response.json())
+            .then(data => {
+                allCategories = data.categories;
+                initializeStorySelector();
+            })
+            .catch(error => {
+                console.error('Error loading stories:', error);
+                alert('Failed to load stories. Please refresh the page.');
+            });
 
-I was so shocked I dropped my **{animal}** on the ground! But {celebrity} just smiled and said, "Perfect! That's exactly the kind of **{bodypart}** we need for the role!"
-
-The next thing I knew, I was **{verb1}** in front of **{number}** cameras, eating **{food}** for dinner, and living the life of a true movie star!`
-            },
-            {
-                title: "The Restaurant",
-                emoji: "🍕",
-                description: "A dining experience you'll never forget!",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Type of Food", id: "food1" },
-                    { label: "Body Part", id: "bodypart" },
-                    { label: "Verb", id: "verb1" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Famous Person", id: "celebrity" },
-                    { label: "Number", id: "number" },
-                    { label: "Liquid", id: "liquid" }
-                ],
-                template: `Last night, I went to the most **{adj1}** restaurant in town. The waiter asked what I wanted, and I said, "I'll have the **{food1}**, please!"
-
-When the dish arrived, it was **{verb1}**! I called the waiter over and pointed at it with my **{bodypart}**. "What is this?!" I exclaimed.
-
-The waiter just smiled and said, "**{exclaim}**! That's our specialty! Even **{celebrity}** orders it **{number}** times a week!"
-
-I took a bite and immediately reached for my glass of **{liquid}**. Let's just say I won't be going back there anytime soon!`
-            },
-            {
-                title: "The Theme Park",
-                emoji: "🎢",
-                description: "The most extreme theme park adventure!",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Adjective", id: "adj2" },
-                    { label: "Body Part", id: "bodypart" },
-                    { label: "Verb (ending in -ing)", id: "verb1" },
-                    { label: "Type of Animal", id: "animal" },
-                    { label: "Famous Person", id: "celebrity" },
-                    { label: "Food", id: "food1" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Number", id: "number" }
-                ],
-                template: `Welcome to the most **{adj1}** theme park in the world! I was so excited to try the new roller coaster that I ate **{number}** **{food1}**s for breakfast.
-
-My friend said, "This ride is so **{adj2}**, they say **{celebrity}** threw up on it last week!"
-
-As we boarded, I felt my **{bodypart}** start to shake. The ride began **{verb1}** faster and faster! Suddenly, a **{animal}** appeared out of nowhere and started running alongside the track!
-
-"**{exclaim}**!" I screamed, as we did a triple loop-de-loop. Best. Day. Ever!`
-            },
-            {
-                title: "The Vacation",
-                emoji: "🏖️",
-                description: "A vacation gone hilariously wrong!",
-                words: [
-                    { label: "Place", id: "place" },
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Verb", id: "verb1" },
-                    { label: "Type of Animal", id: "animal" },
-                    { label: "Body Part", id: "bodypart" },
-                    { label: "Food", id: "food1" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Number", id: "number" }
-                ],
-                template: `My vacation to **{place}** was supposed to be relaxing, but things got **{adj1}** very quickly!
-
-On day one, I tried to **{verb1}** on the beach, but a wild **{animal}** stole my sunscreen and ran away! I chased it using only my **{bodypart}** to dig through the sand.
-
-Exhausted, I stopped at a food stand and ordered some **{food1}**. The vendor looked at me and said, "**{exclaim}**! That'll be **{number}** please!"
-
-I went home with a sunburn, no money, and a story I'll never forget!`
-            },
-            {
-                title: "The Concert",
-                emoji: "🎤",
-                description: "The most epic concert experience!",
-                words: [
-                    { label: "Music Genre", id: "genre" },
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Body Part", id: "bodypart" },
-                    { label: "Verb (ending in -ing)", id: "verb1" },
-                    { label: "Famous Person", id: "celebrity" },
-                    { label: "Food", id: "food1" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Number", id: "number" }
-                ],
-                template: `I finally got tickets to the biggest **{genre}** concert of the year! The arena was **{adj1}** and packed with fans.
-
-When the show started, I was **{verb1}** so hard that I accidentally hit the person next to me with my **{bodypart}**. They turned around and it was **{celebrity}**!
-
-"Sorry!" I yelled over the music. They just laughed and handed me their **{food1}**.
-
-Best concert ever! I sang along to all **{number}** songs, even though I only knew the words to one!`
-            },
-            {
-                title: "😈 The Hookup",
-                emoji: "🔥",
-                description: "A wild night out that got completely out of hand...",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Body Part", id: "bodypart1" },
-                    { label: "Another Body Part", id: "bodypart2" },
-                    { label: "Verb (ending in -ing)", id: "verb1" },
-                    { label: "Dirty Word", id: "dirty" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Number", id: "number" },
-                    { label: "Place", id: "place" }
-                ],
-                template: `So I met this **{adj1}** stranger at the bar and they kept staring at my **{bodypart1}**. Next thing I know, we're at **{place}** and things are getting wild!
-
-They started **{verb1}** and I couldn't help but moan "**{exclaim}**!" Their **{bodypart2}** was everywhere and I was like "damn, this is some **{dirty}** level stuff!"
-
-We went at it for **{number}** hours straight. Best mistake I ever made!`
-            },
-            {
-                title: "🍺 The Hangover",
-                emoji: "🤢",
-                description: "Waking up after a night you can't remember...",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Body Part", id: "bodypart" },
-                    { label: "Type of Alcohol", id: "alcohol" },
-                    { label: "Verb", id: "verb1" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Place", id: "place" },
-                    { label: "Number", id: "number" },
-                    { label: "Embarrassing Thing", id: "embarrass" }
-                ],
-                template: `I woke up in **{place}** with the most **{adj1}** headache of my life. My **{bodypart}** was throbbing and I had no idea how I got there.
-
-Last thing I remember was doing **{number}** shots of **{alcohol}** with my friends. Apparently I started **{verb1}** on a table and yelled "**{exclaim}**!" at the top of my lungs!
-
-Then I somehow ended up **{embarrass}**. I'm never drinking again... until next weekend at least.`
-            },
-            {
-                title: "💀 The Worst Date",
-                emoji: "😬",
-                description: "When your date goes completely off the rails...",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Body Part", id: "bodypart" },
-                    { label: "Food", id: "food1" },
-                    { label: "Verb", id: "verb1" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Place", id: "place" },
-                    { label: "Number", id: "number" },
-                    { label: "Insult", id: "insult" }
-                ],
-                template: `My date started at **{place}** and things seemed **{adj1}** at first. Then they ordered **{food1}** and started **{verb1}** with their mouth open.
-
-I tried to be polite but then they touched my **{bodypart}** without asking! I yelled "**{exclaim}**!" and called them a(n) **{insult}**.
-
-They proceeded to cry for **{number}** minutes straight. I left without paying the bill. 10/10 would not recommend.`
-            },
-            {
-                title: "🚫 The Forbidden Office",
-                emoji: "📎",
-                description: "What happens at work when the boss is away...",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Body Part", id: "bodypart1" },
-                    { label: "Another Body Part", id: "bodypart2" },
-                    { label: "Verb (ending in -ing)", id: "verb1" },
-                    { label: "Office Supply", id: "office" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Number", id: "number" },
-                    { label: "Place in Office", id: "place" }
-                ],
-                template: `It was another boring day at the office until Karen from accounting started **{verb1}** in the break room. Next thing I know, we're in the **{place}** and things are getting heated!
-
-She pressed her **{bodypart1}** against me while I grabbed her **{bodypart2}**. Someone even brought out a(n) **{office}** - I still don't know how that's relevant!
-
-"**{exclaim}**!" she moaned **{number}** times before we heard the boss coming. Worst close call ever!`
-            },
-            {
-                title: "🎰 The Vegas Disaster",
-                emoji: "🎲",
-                description: "What happens in Vegas... should probably stay there!",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Body Part", id: "bodypart" },
-                    { label: "Verb", id: "verb1" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Place", id: "place" },
-                    { label: "Number", id: "number" },
-                    { label: "Thing You Regret", id: "regret" },
-                    { label: "Animal", id: "animal" }
-                ],
-                template: `Vegas was **{adj1}** until I woke up married to a(n) **{animal}** with a tattoo that says "**{exclaim}**!" on my **{bodypart}**.
-
-Apparently I spent **{number}** hours at **{place}**, lost all my money, and started **{verb1}** on the casino floor.
-
-The worst part? I also **{regret}** and now it's all over the internet. Send help.`
-            },
-            {
-                title: "👻 The Haunted Hookup",
-                emoji: "💀",
-                description: "When your one-night stand is literally supernatural...",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Body Part", id: "bodypart1" },
-                    { label: "Another Body Part", id: "bodypart2" },
-                    { label: "Verb (ending in -ing)", id: "verb1" },
-                    { label: "Supernatural Thing", id: "supernatural" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Number", id: "number" },
-                    { label: "Place", id: "place" }
-                ],
-                template: `Met this **{adj1}** stranger at **{place}** and brought them home. Things were going great until they started **{verb1}** and their **{bodypart1}** turned into a **{supernatural}**!
-
-I tried to leave but my **{bodypart2}** was frozen in fear. They whispered "**{exclaim}**!" and suddenly we were floating!
-
-Best **{number}** minutes of my life, then I passed out. Woke up alone with bite marks and no number.`
-            },
-            {
-                title: "🌶️ The Spicy Challenge",
-                emoji: "🔥",
-                description: "Taking dares too far since forever...",
-                words: [
-                    { label: "Adjective", id: "adj1" },
-                    { label: "Body Part", id: "bodypart" },
-                    { label: "Food", id: "food1" },
-                    { label: "Verb", id: "verb1" },
-                    { label: "Exclamation", id: "exclaim" },
-                    { label: "Number", id: "number" },
-                    { label: "Place", id: "place" },
-                    { label: "Liquid", id: "liquid" }
-                ],
-                template: `My friends dared me to eat the spiciest **{food1}** at **{place}**. I thought "how hard could it be?" - famous last words!
-
-One bite and my **{bodypart}** was on fire! I started **{verb1}** around screaming "**{exclaim}**!" while chugging **{number}** gallons of **{liquid}**.
-
-Someone called an ambulance. The paramedics laughed at me for **{adj1}** minutes straight. Worth it for the bragging rights... maybe.`
+        function initializeStorySelector() {
+            if (allCategories.length > 0) {
+                selectStory(0);
             }
-        ];
+        }
 
         function selectStory(index) {
-            currentStoryIndex = index;
+            currentCategoryIndex = index;
             document.querySelectorAll('.story-btn').forEach((btn, i) => {
                 btn.classList.toggle('active', i === index);
             });
-            document.getElementById('storyEmoji').textContent = stories[index].emoji;
-            document.getElementById('storyDescription').textContent = stories[index].description;
+            const category = allCategories[index];
+            document.getElementById('storyEmoji').textContent = category.emoji;
+            document.getElementById('storyDescription').textContent = category.description;
         }
 
         function goToInputs() {
             document.getElementById('selectionSection').classList.remove('active');
             document.getElementById('inputsSection').classList.add('active');
 
-            const story = stories[currentStoryIndex];
+            // Randomly select a story variation from the category
+            const category = allCategories[currentCategoryIndex];
+            const randomIndex = Math.floor(Math.random() * category.stories.length);
+            currentStory = category.stories[randomIndex];
+
             const grid = document.getElementById('inputsGrid');
             grid.innerHTML = '';
 
-            story.words.forEach(word => {
+            currentStory.words.forEach(word => {
                 grid.innerHTML += `
                     <div class="word-input">
                         <label>${word.label}</label>
@@ -433,12 +206,11 @@ Someone called an ambulance. The paramedics laughed at me for **{adj1}** minutes
         }
 
         function generateStory() {
-            const story = stories[currentStoryIndex];
-            let resultText = story.template;
+            let resultText = currentStory.template;
             let allFilled = true;
             let filledValues = {};
 
-            story.words.forEach(word => {
+            currentStory.words.forEach(word => {
                 const value = document.getElementById(word.id).value.trim();
                 if (!value) {
                     allFilled = false;
@@ -453,14 +225,14 @@ Someone called an ambulance. The paramedics laughed at me for **{adj1}** minutes
             }
 
             // Replace placeholders with filled values
-            story.words.forEach(word => {
+            currentStory.words.forEach(word => {
                 const regex = new RegExp(`\\*\\*\\{${word.id}\\}\\*\\*`, 'g');
                 resultText = resultText.replace(regex, `<span class="filled-word">${filledValues[word.id]}</span>`);
             });
 
             document.getElementById('inputsSection').classList.remove('active');
             document.getElementById('resultSection').classList.add('active');
-            document.getElementById('storyResult').innerHTML = resultText;
+            document.getElementById('storyResult').innerHTML = resultText.replace(/\n/g, '<br><br>');
         }
 
         function copyStory() {
