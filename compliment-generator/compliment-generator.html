@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliment Generator</title>
+    <link rel="stylesheet" href="styles/shared.css">
+    <style>
+        .compliment-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .compliment-card.roast-mode {
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+        }
+
+        .compliment-card:hover {
+            transform: scale(1.02);
+        }
+
+        .compliment-emoji {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .compliment-text {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .compliment-name {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            opacity: 0.9;
+        }
+
+        .category-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .toggle-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f0f0f0;
+            padding: 10px 20px;
+            border-radius: 25px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+        }
+
+        .share-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .share-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .floating-hearts {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: float-up 2s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5);
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← Back to Games</a>
+
+        <h1>💬 Compliment Generator</h1>
+        <p class="subtitle">Spread positivity with heartfelt compliments!</p>
+
+        <div class="input-group">
+            <label for="friendName">Friend's Name</label>
+            <input type="text" id="friendName" placeholder="Enter your friend's name">
+        </div>
+
+        <div class="toggle-container">
+            <div class="toggle-wrapper">
+                <div class="toggle-switch" id="roastToggle" onclick="toggleRoastMode()"></div>
+                <span class="toggle-label">🔥 Roast Mode</span>
+            </div>
+        </div>
+
+        <label style="font-weight: 600; color: #333; display: block; margin-bottom: 10px;">Choose Category:</label>
+        <div class="category-selector">
+            <button class="category-btn active" onclick="setCategory('general', this)">✨ General</button>
+            <button class="category-btn" onclick="setCategory('friendship', this)">🤝 Friendship</button>
+            <button class="category-btn" onclick="setCategory('personality', this)">🌟 Personality</button>
+            <button class="category-btn" onclick="setCategory('funny', this)">😄 Funny</button>
+            <button class="category-btn" onclick="setCategory('support', this)">💪 Support</button>
+            <button class="category-btn" onclick="setCategory('love', this)">💕 Love</button>
+            <button class="category-btn" onclick="setCategory('birthday', this)">🎂 Birthday</button>
+            <button class="category-btn" onclick="setCategory('work', this)">💼 Work</button>
+            <button class="category-btn" onclick="setCategory('fitness', this)">🏋️ Fitness</button>
+        </div>
+
+        <button class="btn generate-btn" onclick="generateCompliment()">Generate Compliment</button>
+
+        <div class="compliment-card" id="complimentCard" style="display: none;">
+            <div class="compliment-emoji" id="complimentEmoji">💖</div>
+            <div class="compliment-text" id="complimentText"></div>
+            <div class="compliment-name" id="complimentName"></div>
+        </div>
+
+        <div class="action-row" id="actionRow" style="display: none;">
+            <button class="action-btn share-btn" onclick="copyCompliment()">📋 Copy</button>
+            <button class="action-btn share-btn" onclick="generateCompliment()">🔄 Another</button>
+        </div>
+    </div>
+
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <script>
+        let currentCategory = 'general';
+        let isRoastMode = false;
+        let compliments = {};
+        let roasts = {};
+        let dataLoaded = false;
+
+        // Load data from JSON file with cache busting
+        async function loadData() {
+            try {
+                const response = await fetch('compliments-data.json?v=' + Date.now());
+                const data = await response.json();
+                compliments = data.compliments;
+                roasts = data.roasts;
+                dataLoaded = true;
+                console.log('✅ Data loaded successfully!');
+                console.log('📊 Loaded', Object.keys(compliments).length, 'compliment categories');
+                console.log('🔥 Loaded', Object.keys(roasts).length, 'roast categories');
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Failed to load compliments data. Please refresh the page.');
+            }
+        }
+
+        // Load data on page load
+        loadData();
+
+        function setCategory(category, btnElement) {
+            currentCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+        }
+
+        function toggleRoastMode() {
+            isRoastMode = !isRoastMode;
+            const toggle = document.getElementById('roastToggle');
+            const card = document.getElementById('complimentCard');
+            
+            if (isRoastMode) {
+                toggle.classList.add('active');
+                card.classList.add('roast-mode');
+                document.querySelector('h1').textContent = '🔥 Roast Generator';
+                document.querySelector('.subtitle').textContent = 'Brace yourself for brutal honesty!';
+            } else {
+                toggle.classList.remove('active');
+                card.classList.remove('roast-mode');
+                document.querySelector('h1').textContent = '💬 Compliment Generator';
+                document.querySelector('.subtitle').textContent = 'Spread positivity with heartfelt compliments!';
+            }
+        }
+
+        function generateCompliment() {
+            if (!dataLoaded) {
+                alert('Loading content... please try again in a moment.');
+                return;
+            }
+
+            const friendName = document.getElementById('friendName').value.trim() || 'You';
+            const sourceData = isRoastMode ? roasts : compliments;
+            const categoryData = sourceData[currentCategory];
+            const randomItem = categoryData[Math.floor(Math.random() * categoryData.length)];
+
+            // Replace {name} placeholder with actual name
+            let text = randomItem.text.replace(/{name}/g, friendName);
+
+            document.getElementById('complimentEmoji').textContent = randomItem.emoji;
+            document.getElementById('complimentText').textContent = text;
+            document.getElementById('complimentName').textContent = isRoastMode ? `🔥 Roasted: ${friendName}` : `✨ For: ${friendName}`;
+
+            document.getElementById('complimentCard').style.display = 'flex';
+            document.getElementById('actionRow').style.display = 'flex';
+
+            if (!isRoastMode) {
+                createFloatingHearts();
+            } else {
+                createFloatingFire();
+            }
+        }
+
+        function copyCompliment() {
+            const text = `${document.getElementById('complimentText').textContent} ${document.getElementById('complimentName').textContent}`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert(isRoastMode ? 'Roast copied! Share the burn! 🔥' : 'Compliment copied! Share the positivity! 💖');
+            });
+        }
+
+        function createFloatingHearts() {
+            const container = document.getElementById('floatingHearts');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 10; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = ['💖', '💕', '✨', '💗', '💝'][Math.floor(Math.random() * 5)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = Math.random() * 50 + 50 + 'vh';
+                heart.style.animationDelay = Math.random() * 0.5 + 's';
+                container.appendChild(heart);
+
+                setTimeout(() => heart.remove(), 2000);
+            }
+        }
+
+        function createFloatingFire() {
+            const container = document.getElementById('floatingHearts');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 10; i++) {
+                const fire = document.createElement('div');
+                fire.className = 'heart';
+                fire.textContent = ['🔥', '💀', '⚠️', '🌶️', '😈'][Math.floor(Math.random() * 5)];
+                fire.style.left = Math.random() * 100 + 'vw';
+                fire.style.top = Math.random() * 50 + 50 + 'vh';
+                fire.style.animationDelay = Math.random() * 0.5 + 's';
+                container.appendChild(fire);
+
+                setTimeout(() => fire.remove(), 2000);
+            }
+        }
+    </script>
+</body>
+</html>
