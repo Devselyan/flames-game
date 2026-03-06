@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friendship Tarot</title>
+    <link rel="stylesheet" href="../styles/shared.css">
+    <style>
+        .tarot-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .card-deck {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .tarot-card {
+            width: 80px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            border: 3px solid transparent;
+        }
+
+        .tarot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(118, 75, 162, 0.4);
+        }
+
+        .tarot-card.selected {
+            border-color: #ffd700;
+            transform: scale(1.1);
+        }
+
+        .tarot-card.revealed {
+            background: white;
+            border: 3px solid #764ba2;
+        }
+
+        .reading-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 15px;
+            width: 100%;
+            display: none;
+        }
+
+        .reading-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .reading-card h4 {
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+
+        .card-symbol {
+            font-size: 3rem;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .spread-info {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-btn">← Back to Games</a>
+
+        <h1>🔮 Friendship Tarot</h1>
+        <p class="subtitle">Draw cards to reveal insights about your friendships</p>
+
+        <div class="input-group">
+            <label for="yourName">Your Name</label>
+            <input type="text" id="yourName" placeholder="Enter your name">
+        </div>
+
+        <div class="input-group">
+            <label for="friendName">Friend's Name</label>
+            <input type="text" id="friendName" placeholder="Enter your friend's name">
+        </div>
+
+        <p class="spread-info">Select 3 cards for your friendship reading</p>
+
+        <div class="card-deck" id="cardDeck"></div>
+
+        <button class="btn" onclick="startReading()" style="margin-top: 20px;">Start Reading</button>
+
+        <div class="reading-section" id="readingSection">
+            <h3 style="text-align: center; color: #764ba2;">Your Friendship Reading</h3>
+            <div id="readingContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const tarotCards = [
+            { name: "The Fool", symbol: "🤡", meaning: "New beginnings, spontaneity, innocence", friendship: "A fresh start in your friendship or a new adventure together." },
+            { name: "The Magician", symbol: "🎩", meaning: "Manifestation, resourcefulness, power", friendship: "You have the power to create the friendship you desire." },
+            { name: "The High Priestess", symbol: "🌙", meaning: "Intuition, sacred knowledge, divine feminine", friendship: "Trust your intuition about this friendship." },
+            { name: "The Empress", symbol: "👑", meaning: "Femininity, beauty, nature, nurturing", friendship: "A nurturing, supportive friendship that helps you grow." },
+            { name: "The Emperor", symbol: "🤴", meaning: "Authority, structure, control", friendship: "A stable friendship built on respect and mutual understanding." },
+            { name: "The Hierophant", symbol: "📿", meaning: "Spiritual wisdom, religious beliefs, conformity", friendship: "A friendship that teaches you important life lessons." },
+            { name: "The Lovers", symbol: "💕", meaning: "Love, harmony, relationships, values alignment", friendship: "Deep harmony and shared values in your friendship." },
+            { name: "The Chariot", symbol: "🏆", meaning: "Control, willpower, success, determination", friendship: "Overcoming challenges together strengthens your bond." },
+            { name: "Strength", symbol: "🦁", meaning: "Strength, courage, persuasion, influence", friendship: "A friendship that gives you both courage and inner strength." },
+            { name: "The Hermit", symbol: "🏔️", meaning: "Soul-searching, introspection, being alone", friendship: "Sometimes space apart helps you appreciate the friendship more." },
+            { name: "Wheel of Fortune", symbol: "🎡", meaning: "Good luck, karma, life cycles, destiny", friendship: "Positive changes coming to your friendship." },
+            { name: "Justice", symbol: "⚖️", meaning: "Justice, fairness, truth, cause and effect", friendship: "Balance and honesty are key in this friendship." },
+            { name: "The Hanged Man", symbol: "🙃", meaning: "Pause, surrender, letting go, new perspectives", friendship: "A time to see your friendship from a new angle." },
+            { name: "Death", symbol: "💀", meaning: "Endings, change, transformation, transition", friendship: "A transformation in your friendship - letting go of old patterns." },
+            { name: "Temperance", symbol: "🏺", meaning: "Balance, moderation, patience, purpose", friendship: "Finding the right balance gives your friendship harmony." },
+            { name: "The Devil", symbol: "😈", meaning: "Shadow self, attachment, addiction, restriction", friendship: "Watch for unhealthy patterns or codependency." },
+            { name: "The Tower", symbol: "⚡", meaning: "Sudden change, upheaval, chaos, revelation", friendship: "A sudden revelation that changes how you see the friendship." },
+            { name: "The Star", symbol: "⭐", meaning: "Hope, faith, purpose, renewal, spirituality", friendship: "A hopeful, inspiring friendship that lifts you both up." },
+            { name: "The Moon", symbol: "🌕", meaning: "Illusion, fear, anxiety, subconscious, intuition", friendship: "Some things may not be as they seem - trust your feelings." },
+            { name: "The Sun", symbol: "☀️", meaning: "Positivity, fun, warmth, success, vitality", friendship: "Joy, happiness, and warmth in your friendship!" },
+            { name: "Judgement", symbol: "🎺", meaning: "Judgement, rebirth, inner calling, absolution", friendship: "A time of reckoning - evaluating what this friendship means." },
+            { name: "The World", symbol: "🌍", meaning: "Completion, integration, accomplishment, travel", friendship: "A fulfilling friendship that enriches your whole world." }
+        ];
+
+        let selectedCards = [];
+        let selectedIndices = [];
+
+        function createDeck() {
+            const deck = document.getElementById('cardDeck');
+            deck.innerHTML = '';
+            
+            // Create 22 cards (Major Arcana)
+            tarotCards.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'tarot-card';
+                cardEl.dataset.index = index;
+                cardEl.textContent = '?';
+                cardEl.onclick = () => selectCard(index, cardEl);
+                deck.appendChild(cardEl);
+            });
+        }
+
+        function selectCard(index, cardEl) {
+            if (selectedIndices.includes(index) || selectedCards.length >= 3) return;
+            
+            selectedIndices.push(index);
+            cardEl.classList.add('selected');
+            
+            if (selectedCards.length === 2) {
+                selectedCards.push({ card: tarotCards[index], element: cardEl });
+                revealCards();
+            } else {
+                selectedCards.push({ card: tarotCards[index], element: cardEl });
+            }
+        }
+
+        function revealCards() {
+            setTimeout(() => {
+                selectedCards.forEach((item, i) => {
+                    item.element.classList.add('revealed');
+                    item.element.textContent = item.card.symbol;
+                });
+                showReading();
+            }, 500);
+        }
+
+        function showReading() {
+            const readingSection = document.getElementById('readingSection');
+            const readingContent = document.getElementById('readingContent');
+            const yourName = document.getElementById('yourName').value.trim() || 'You';
+            const friendName = document.getElementById('friendName').value.trim() || 'your friend';
+
+            const positions = ['Past', 'Present', 'Future'];
+            
+            let html = '';
+            selectedCards.forEach((item, i) => {
+                html += `
+                    <div class="reading-card">
+                        <h4>${positions[i]}: ${item.card.name}</h4>
+                        <div class="card-symbol">${item.card.symbol}</div>
+                        <p><strong>Meaning:</strong> ${item.card.meaning}</p>
+                        <p><strong>For ${yourName} & ${friendName}:</strong> ${item.card.friendship}</p>
+                    </div>
+                `;
+            });
+
+            readingContent.innerHTML = html;
+            readingSection.style.display = 'block';
+        }
+
+        function startReading() {
+            const yourName = document.getElementById('yourName').value.trim();
+            const friendName = document.getElementById('friendName').value.trim();
+
+            if (!yourName || !friendName) {
+                alert('Please enter both names for the reading!');
+                return;
+            }
+
+            selectedCards = [];
+            selectedIndices = [];
+            document.getElementById('readingSection').style.display = 'none';
+            createDeck();
+        }
+
+        // Initialize deck on load
+        createDeck();
+    </script>
+</body>
+</html>

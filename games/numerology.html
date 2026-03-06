@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Name Numerology</title>
+    <link rel="stylesheet" href="../styles/shared.css">
+    <style>
+        .numerology-result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .number-display {
+            font-size: 4rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .meaning-text {
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .compatibility-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .compatibility-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-btn">← Back to Games</a>
+
+        <h1>🔢 Name Numerology</h1>
+        <p class="subtitle">Discover the hidden meaning in your names</p>
+
+        <div class="input-group">
+            <label for="name1">Your Name</label>
+            <input type="text" id="name1" placeholder="Enter your name">
+        </div>
+
+        <div class="input-group">
+            <label for="name2">Friend's Name (optional)</label>
+            <input type="text" id="name2" placeholder="Enter friend's name for compatibility">
+        </div>
+
+        <button class="btn" onclick="calculateNumerology()">Calculate</button>
+
+        <div class="numerology-result" id="resultSection">
+            <div id="singleResult">
+                <h3>Your Life Path Number</h3>
+                <div class="number-display" id="lifePathNumber">0</div>
+                <div class="meaning-text" id="meaningText"></div>
+            </div>
+            <div class="compatibility-section" id="compatibilitySection" style="display: none;">
+                <h3>Friendship Compatibility</h3>
+                <div class="compatibility-score" id="compatibilityScore">0%</div>
+                <div class="meaning-text" id="compatibilityText"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const meanings = {
+            1: "Leadership, independence, and originality. You're a natural born leader with strong determination.",
+            2: "Cooperation, balance, and diplomacy. You excel at partnerships and bringing people together.",
+            3: "Creativity, communication, and joy. You have a gift for expression and inspiring others.",
+            4: "Stability, hard work, and practicality. You build solid foundations and value loyalty.",
+            5: "Freedom, adventure, and change. You thrive on variety and new experiences.",
+            6: "Responsibility, nurturing, and harmony. You care deeply about family and community.",
+            7: "Analysis, wisdom, and spirituality. You seek deeper truths and understanding.",
+            8: "Ambition, success, and material mastery. You have strong business acumen.",
+            9: "Compassion, generosity, and universal love. You're idealistic and humanitarian."
+        };
+
+        function calculateNumber(name) {
+            const letterValues = {
+                'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9,
+                'j': 1, 'k': 2, 'l': 3, 'm': 4, 'n': 5, 'o': 6, 'p': 7, 'q': 8, 'r': 9,
+                's': 1, 't': 2, 'u': 3, 'v': 4, 'w': 5, 'x': 6, 'y': 7, 'z': 8
+            };
+
+            let sum = 0;
+            for (let char of name.toLowerCase()) {
+                if (letterValues[char]) {
+                    sum += letterValues[char];
+                }
+            }
+
+            // Reduce to single digit
+            while (sum > 9) {
+                let newSum = 0;
+                while (sum > 0) {
+                    newSum += sum % 10;
+                    sum = Math.floor(sum / 10);
+                }
+                sum = newSum;
+            }
+
+            return sum || 1;
+        }
+
+        function calculateNumerology() {
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+
+            if (!name1) {
+                alert('Please enter at least your name!');
+                return;
+            }
+
+            const number1 = calculateNumber(name1);
+            const resultSection = document.getElementById('resultSection');
+            const lifePathNumber = document.getElementById('lifePathNumber');
+            const meaningText = document.getElementById('meaningText');
+            const compatibilitySection = document.getElementById('compatibilitySection');
+
+            resultSection.style.display = 'block';
+            lifePathNumber.textContent = number1;
+            meaningText.textContent = meanings[number1];
+
+            if (name2) {
+                const number2 = calculateNumber(name2);
+                const compatibility = calculateCompatibility(number1, number2);
+                
+                document.getElementById('compatibilityScore').textContent = compatibility + '%';
+                document.getElementById('compatibilityText').textContent = getCompatibilityMessage(compatibility);
+                compatibilitySection.style.display = 'block';
+            } else {
+                compatibilitySection.style.display = 'none';
+            }
+        }
+
+        function calculateCompatibility(num1, num2) {
+            const diff = Math.abs(num1 - num2);
+            if (diff === 0) return 95;
+            if (diff === 1 || diff === 2) return 85;
+            if (diff === 3 || diff === 4) return 70;
+            if (diff === 5) return 60;
+            return 75;
+        }
+
+        function getCompatibilityMessage(score) {
+            if (score >= 90) return "Amazing friendship! You're perfectly in sync!";
+            if (score >= 80) return "Great compatibility! You understand each other well.";
+            if (score >= 70) return "Good friendship potential with some differences to explore.";
+            if (score >= 60) return "Different perspectives, but that can make your friendship interesting!";
+            return "Opposites attract! Your differences can complement each other.";
+        }
+    </script>
+</body>
+</html>
