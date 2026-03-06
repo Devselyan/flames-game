@@ -119,10 +119,23 @@
 
         .player-turn {
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 2rem;
             color: #764ba2;
-            font-weight: 600;
-            margin-bottom: 10px;
+            font-weight: 700;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .player-turn .current-player-name {
+            font-size: 2.5rem;
+            color: #667eea;
+            font-weight: 800;
+            display: block;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -225,9 +238,9 @@
         function loadQuestion() {
             const name1 = document.getElementById('name1').value.trim();
             const name2 = document.getElementById('name2').value.trim();
-            const q = questions[currentQuestion];
-
-            document.getElementById('playerTurn').textContent = `${currentPlayer === 1 ? name1 : name2}'s turn`;
+            const currentPlayerName = currentPlayer === 1 ? name1 : name2;
+            
+            document.getElementById('playerTurn').innerHTML = `<span style="font-size: 1.2rem;">${currentPlayerName}'s</span><span class="current-player-name">${currentPlayerName}</span><span style="font-size: 1.2rem;">Choose!</span>`;
             document.getElementById('questionText').textContent = `This or That?`;
             document.getElementById('progressFill').style.width = `${((currentQuestion) / questions.length) * 100}%`;
 
