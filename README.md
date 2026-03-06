@@ -4,7 +4,7 @@ A fun relationship compatibility game built with HTML, CSS, and JavaScript!
 
 ## Play Now
 
-[Open the game](https://yourusername.github.io/flames-game/)
+[Open the game](https://devselyan.github.io/flames-game/)
 
 ## Features
 
@@ -37,7 +37,7 @@ A fun relationship compatibility game built with HTML, CSS, and JavaScript!
 2. Open `index.html` in your browser
 
 ```bash
-git clone https://github.com/yourusername/flames-game.git
+git clone https://github.com/Devselyan/flames-game.git
 cd flames-game
 open index.html
 ```
@@ -46,7 +46,7 @@ open index.html
 
 1. Go to your repository Settings → Pages
 2. Select source as `main` branch
-3. Your site will be live at `https://yourusername.github.io/flames-game/`
+3. Your site will be live at `https://devselyan.github.io/flames-game/`
 
 ---
 
