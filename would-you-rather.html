@@ -193,8 +193,6 @@
                 <div class="question-text" id="questionText"></div>
                 <div class="options-container" id="optionsContainer"></div>
             </div>
-
-            <button class="btn" onclick="nextQuestion()" id="nextBtn" style="display: none; margin-top: 20px;">Next Question</button>
         </div>
 
         <!-- Results Section -->
@@ -344,16 +342,28 @@
         function selectOption(choice) {
             if (currentPlayer === 1) {
                 player1Answers.push(choice);
+                currentPlayer = 2;
+                loadQuestion();
             } else {
                 player2Answers.push(choice);
+                
+                // Update matches count
+                let matches = 0;
+                for (let i = 0; i < player2Answers.length; i++) {
+                    if (player1Answers[i] === player2Answers[i]) matches++;
+                }
+                document.getElementById('matchesStat').textContent = matches;
+                
+                currentQuestion++;
+                
+                if (currentQuestion >= currentQuestions.length) {
+                    showResults();
+                    return;
+                }
+                
+                currentPlayer = 1;
+                loadQuestion();
             }
-
-            document.querySelectorAll('.option-card').forEach((card, i) => {
-                card.classList.add('answered');
-                if (i === choice) card.classList.add('selected');
-            });
-
-            document.getElementById('nextBtn').style.display = 'block';
         }
 
         function nextQuestion() {

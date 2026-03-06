@@ -159,8 +159,6 @@
                 <div class="question-text" id="questionText"></div>
                 <div class="options-row" id="optionsRow"></div>
             </div>
-
-            <button class="btn" onclick="nextQuestion()" id="nextBtn" style="display: none; margin-top: 20px;">Next Question</button>
         </div>
 
         <!-- Results Section -->
@@ -245,16 +243,20 @@
         function selectOption(choice) {
             if (currentPlayer === 1) {
                 player1Answers.push(choice);
+                currentPlayer = 2;
+                loadQuestion();
             } else {
                 player2Answers.push(choice);
+                currentQuestion++;
+                
+                if (currentQuestion >= questions.length) {
+                    showResults();
+                    return;
+                }
+                
+                currentPlayer = 1;
+                loadQuestion();
             }
-
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.classList.add('answered');
-            });
-            document.querySelectorAll('.option-btn')[choice].classList.add('selected');
-
-            document.getElementById('nextBtn').style.display = 'block';
         }
 
         function nextQuestion() {

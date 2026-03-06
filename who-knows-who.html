@@ -122,54 +122,6 @@
             margin-bottom: 20px;
             font-weight: 600;
         }
-
-        .feedback-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .feedback-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 400px;
-            margin: 20px;
-        }
-
-        .feedback-emoji {
-            font-size: 4rem;
-            margin-bottom: 15px;
-        }
-
-        .feedback-text {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .feedback-detail {
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .continue-btn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -217,16 +169,6 @@
             <div class="score-breakdown" id="scoreBreakdown"></div>
 
             <button class="btn" onclick="resetGame()" style="margin-top: 20px;">Play Again</button>
-        </div>
-    </div>
-
-    <!-- Feedback Overlay -->
-    <div class="feedback-overlay" id="feedbackOverlay">
-        <div class="feedback-content">
-            <div class="feedback-emoji" id="feedbackEmoji"></div>
-            <div class="feedback-text" id="feedbackMainText"></div>
-            <div class="feedback-detail" id="feedbackDetail"></div>
-            <button class="continue-btn" onclick="continueGame()">Continue</button>
         </div>
     </div>
 
@@ -340,11 +282,9 @@
 
         function handleOptionClick(selectedIndex) {
             if (phase === 1) {
-                // Phase 1: Just save the answer and move on
                 player1Answers.push(selectedIndex);
                 nextQuestion();
             } else {
-                // Phase 2: Check if correct and show feedback
                 player2Guesses.push(selectedIndex);
                 const correctAnswer = player1Answers[currentQuestion];
                 const isCorrect = selectedIndex === correctAnswer;
@@ -352,39 +292,9 @@
                 if (isCorrect) {
                     player2Score++;
                 }
-
-                showFeedback(isCorrect, correctAnswer);
+                
+                nextQuestion();
             }
-        }
-
-        function showFeedback(isCorrect, correctAnswer) {
-            const name1 = document.getElementById('name1').value.trim();
-            const name2 = document.getElementById('name2').value.trim();
-            const q = questions[currentQuestion];
-
-            const overlay = document.getElementById('feedbackOverlay');
-            const emoji = document.getElementById('feedbackEmoji');
-            const mainText = document.getElementById('feedbackMainText');
-            const detail = document.getElementById('feedbackDetail');
-
-            if (isCorrect) {
-                emoji.textContent = '✅';
-                mainText.textContent = 'Correct!';
-                mainText.style.color = '#28a745';
-                detail.textContent = `${name2} knows ${name1} well!`;
-            } else {
-                emoji.textContent = '❌';
-                mainText.textContent = 'Wrong!';
-                mainText.style.color = '#dc3545';
-                detail.textContent = `${name1}'s answer was: ${q.options[correctAnswer]}`;
-            }
-
-            overlay.style.display = 'flex';
-        }
-
-        function continueGame() {
-            document.getElementById('feedbackOverlay').style.display = 'none';
-            nextQuestion();
         }
 
         function nextQuestion() {
