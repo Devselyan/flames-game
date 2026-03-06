@@ -60,19 +60,26 @@ body {
     background: var(--container-bg);
     border: 2px solid var(--input-border);
     border-radius: 50px;
-    padding: 10px 15px;
+    padding: 12px 20px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 1.2rem;
+    gap: 10px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
     transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: 0 4px 15px var(--shadow);
+    z-index: 10000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .theme-toggle:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
 }
 
 .back-btn {
