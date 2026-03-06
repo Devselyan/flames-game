@@ -324,31 +324,40 @@
             }
         }
 
-        function toggleNsfwMode() {
+        // Expose to window for onclick handler
+        window.toggleNsfwMode = function() {
             isNsfwMode = !isNsfwMode;
-            console.log('toggleNsfwMode called, isNsfwMode:', isNsfwMode);
-
+            console.log('🌶️ toggleNsfwMode called, isNsfwMode:', isNsfwMode);
+            
             const toggle = document.getElementById('nsfwToggle');
             const naughtyBtn = document.getElementById('naughtyBtn');
             const warning = document.getElementById('nsfwWarning');
             const card = document.getElementById('complimentCard');
-
-            console.log('Elements found:', { toggle, naughtyBtn, warning, card });
+            
+            console.log('Elements:', {
+                toggle: toggle ? 'found' : 'NOT FOUND',
+                naughtyBtn: naughtyBtn ? 'found' : 'NOT FOUND',
+                warning: warning ? 'found' : 'NOT FOUND',
+                card: card ? 'found' : 'NOT FOUND'
+            });
 
             if (isNsfwMode) {
+                console.log('Enabling naughty mode...');
                 toggle.classList.add('nsfw-active');
                 naughtyBtn.classList.remove('hidden');
                 warning.classList.remove('hidden');
                 card.classList.add('nsfw-mode');
-                console.log('Naughty mode ENABLED');
+                console.log('✅ Naughty mode ENABLED');
+                console.log('naughtyBtn classes:', naughtyBtn.classList);
+                console.log('warning classes:', warning.classList);
             } else {
+                console.log('Disabling naughty mode...');
                 toggle.classList.remove('nsfw-active');
                 naughtyBtn.classList.add('hidden');
                 warning.classList.add('hidden');
                 card.classList.remove('nsfw-mode');
-                console.log('Naughty mode DISABLED');
+                console.log('❌ Naughty mode DISABLED');
                 if (currentCategory === 'naughty') {
-                    // Reset to general category and update UI
                     currentCategory = 'general';
                     document.querySelectorAll('.category-btn').forEach(btn => {
                         btn.classList.remove('active');
@@ -356,7 +365,7 @@
                     document.querySelector('.category-btn').classList.add('active');
                 }
             }
-        }
+        };
 
         function generateCompliment() {
             if (!dataLoaded) {
