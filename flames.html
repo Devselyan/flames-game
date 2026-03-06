@@ -82,7 +82,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="flamesGame">
         <a href="index.html" class="back-btn">← Back to Games</a>
 
         <h1>🔥 FLAMES</h1>
@@ -114,6 +114,7 @@
         </div>
     </div>
 
+    <script src="scripts/utils.js"></script>
     <script>
         const flamesData = [
             { letter: 'F', meaning: 'Friends', emoji: '🤝' },
@@ -125,11 +126,13 @@
         ];
 
         function calculateFLAMES() {
+            clearMessages('flamesGame');
+            
             const name1 = document.getElementById('name1').value.trim().toLowerCase().replace(/[^a-z]/g, '');
             const name2 = document.getElementById('name2').value.trim().toLowerCase().replace(/[^a-z]/g, '');
 
             if (!name1 || !name2) {
-                alert('Please enter both names!');
+                showError('flamesGame', 'Please enter both names!');
                 return;
             }
 
@@ -152,7 +155,7 @@
             }
 
             const count = name1Chars.length + name2Chars.length;
-            
+
             // Show result section
             const resultSection = document.getElementById('flamesResult');
             resultSection.style.display = 'block';
@@ -218,6 +221,10 @@
                 document.getElementById('resultEmoji').textContent = result.emoji;
                 document.getElementById('resultLetter').textContent = result.letter;
                 document.getElementById('resultMeaning').textContent = result.meaning;
+                
+                // Trigger confetti celebration!
+                createConfetti(150);
+                showSuccess('flamesResult', `You are ${result.meaning}!`);
             }, 500);
         }
     </script>

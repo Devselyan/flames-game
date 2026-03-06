@@ -1,3 +1,33 @@
+/* CSS Variables for theming */
+:root {
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --container-bg: #ffffff;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --input-bg: #ffffff;
+    --input-border: #e0e0e0;
+    --btn-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: #f8f8f8;
+    --border-color: #e0e0e0;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --hover-bg: #e0e0e0;
+}
+
+/* Dark mode variables */
+[data-theme="dark"] {
+    --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --container-bg: #1e1e2f;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --input-bg: #2a2a3e;
+    --input-border: #3a3a4e;
+    --btn-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: #2a2a3e;
+    --border-color: #3a3a4e;
+    --shadow: rgba(0, 0, 0, 0.5);
+    --hover-bg: #3a3a4e;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,18 +36,43 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bg-gradient);
     min-height: 100vh;
     padding: 40px 20px;
+    transition: background 0.3s ease;
 }
 
 .container {
     max-width: 600px;
     margin: 0 auto;
-    background: white;
+    background: var(--container-bg);
     border-radius: 20px;
     padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px var(--shadow);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dark Mode Toggle */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--container-bg);
+    border: 2px solid var(--input-border);
+    border-radius: 50px;
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 15px var(--shadow);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.05);
 }
 
 .back-btn {
@@ -28,12 +83,12 @@ body {
     margin-bottom: 20px;
     padding: 10px 20px;
     border-radius: 10px;
-    background: #f0f0f0;
-    transition: background 0.3s;
+    background: var(--card-bg);
+    transition: background 0.3s, color 0.3s;
 }
 
 .back-btn:hover {
-    background: #e0e0e0;
+    background: var(--hover-bg);
 }
 
 h1 {
@@ -45,7 +100,7 @@ h1 {
 
 .subtitle {
     text-align: center;
-    color: #666;
+    color: var(--text-secondary);
     margin-bottom: 30px;
     font-size: 1rem;
 }
@@ -56,7 +111,7 @@ h1 {
 
 .input-group label {
     display: block;
-    color: #333;
+    color: var(--text-primary);
     font-weight: 600;
     margin-bottom: 8px;
 }
@@ -64,10 +119,12 @@ h1 {
 .input-group input {
     width: 100%;
     padding: 15px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid var(--input-border);
     border-radius: 10px;
     font-size: 1rem;
-    transition: border-color 0.3s;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: border-color 0.3s, background 0.3s;
 }
 
 .input-group input:focus {
@@ -78,7 +135,7 @@ h1 {
 .btn {
     width: 100%;
     padding: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--btn-gradient);
     color: white;
     border: none;
     border-radius: 10px;
@@ -93,10 +150,181 @@ h1 {
     box-shadow: 0 10px 30px rgba(118, 75, 162, 0.4);
 }
 
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .result-section {
     margin-top: 30px;
     padding-top: 30px;
-    border-top: 2px solid #f0f0f0;
+    border-top: 2px solid var(--border-color);
     text-align: center;
     display: none;
+}
+
+/* Smooth transitions between screens */
+.game-section {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.game-section.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.game-section.fade-out {
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--input-border);
+    border-top-color: #764ba2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.loading-text {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+/* Skeleton loader */
+.skeleton {
+    background: linear-gradient(90deg, var(--card-bg) 25%, var(--input-border) 50%, var(--card-bg) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-text {
+    height: 20px;
+    margin: 10px 0;
+}
+
+.skeleton-title {
+    height: 40px;
+    margin: 20px 0;
+}
+
+/* Confetti Animation */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    opacity: 0;
+}
+
+.confetti.fall {
+    animation: fall 3s linear forwards;
+}
+
+@keyframes fall {
+    0% {
+        top: -10px;
+        opacity: 1;
+    }
+    100% {
+        top: 100vh;
+        opacity: 0;
+    }
+}
+
+.confetti.spin {
+    animation: spin-confetti 3s linear infinite;
+}
+
+@keyframes spin-confetti {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(720deg); }
+}
+
+/* Error message styling */
+.error-message {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.3s ease;
+}
+
+.error-message.hidden {
+    display: none;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-message {
+    background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.3s ease;
+}
+
+/* Card hover effects */
+.card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px var(--shadow);
 }
