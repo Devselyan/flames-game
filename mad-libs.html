@@ -140,7 +140,6 @@
 
     <script>
         let currentStoryIndex = 0;
-        let userInputs = {};
 
         const stories = [
             {
@@ -157,11 +156,11 @@
                     { label: "Number", id: "number" },
                     { label: "Food (plural)", id: "food" }
                 ],
-                template: `One day, I was walking down the street when suddenly a {adj1} limousine pulled up next to me. Out stepped {celebrity}, who said, "You're the most {adj2} person I've ever seen! Want to be in my next movie?"
+                template: `One day, I was walking down the street when suddenly a **{adj1}** limousine pulled up next to me. Out stepped **{celebrity}**, who said, "You're the most **{adj2}** person I've ever seen! Want to be in my next movie?"
 
-I was so shocked I dropped my {animal} on the ground! But {celebrity} just smiled and said, "Perfect! That's exactly the kind of {bodypart} we need for the role!"
+I was so shocked I dropped my **{animal}** on the ground! But {celebrity} just smiled and said, "Perfect! That's exactly the kind of **{bodypart}** we need for the role!"
 
-The next thing I knew, I was {verb1} in front of {number} cameras, eating {food} for dinner, and living the life of a true movie star!`
+The next thing I knew, I was **{verb1}** in front of **{number}** cameras, eating **{food}** for dinner, and living the life of a true movie star!`
             },
             {
                 title: "The Restaurant",
@@ -177,13 +176,13 @@ The next thing I knew, I was {verb1} in front of {number} cameras, eating {food}
                     { label: "Number", id: "number" },
                     { label: "Liquid", id: "liquid" }
                 ],
-                template: `Last night, I went to the most {adj1} restaurant in town. The waiter asked what I wanted, and I said, "I'll have the {food1}, please!"
+                template: `Last night, I went to the most **{adj1}** restaurant in town. The waiter asked what I wanted, and I said, "I'll have the **{food1}**, please!"
 
-When the dish arrived, it was moving! I called the waiter over and pointed at it with my {bodypart}. "What is this?!" I exclaimed.
+When the dish arrived, it was **{verb1}**! I called the waiter over and pointed at it with my **{bodypart}**. "What is this?!" I exclaimed.
 
-The waiter just smiled and said, "{exclaim}! That's our specialty! Even {celebrity} orders it {number} times a week!"
+The waiter just smiled and said, "**{exclaim}**! That's our specialty! Even **{celebrity}** orders it **{number}** times a week!"
 
-I took a bite and immediately reached for my glass of {liquid}. Let's just say I won't be going back there anytime soon!`
+I took a bite and immediately reached for my glass of **{liquid}**. Let's just say I won't be going back there anytime soon!`
             },
             {
                 title: "The Theme Park",
@@ -199,13 +198,13 @@ I took a bite and immediately reached for my glass of {liquid}. Let's just say I
                     { label: "Food", id: "food1" },
                     { label: "Exclamation", id: "exclaim" }
                 ],
-                template: `Welcome to the most {adj1} theme park in the world! I was so excited to try the new roller coaster that I ate {number} {food1}s for breakfast.
+                template: `Welcome to the most **{adj1}** theme park in the world! I was so excited to try the new roller coaster that I ate **{number}** **{food1}**s for breakfast.
 
-My friend said, "This ride is so {adj2}, they say {celebrity} threw up on it last week!"
+My friend said, "This ride is so **{adj2}**, they say **{celebrity}** threw up on it last week!"
 
-As we boarded, I felt my {bodypart} start to shake. The ride began {verb1} faster and faster! Suddenly, a {animal} appeared out of nowhere and started running alongside the track!
+As we boarded, I felt my **{bodypart}** start to shake. The ride began **{verb1}** faster and faster! Suddenly, a **{animal}** appeared out of nowhere and started running alongside the track!
 
-"{exclaim}!" I screamed, as we did a triple loop-de-loop. Best. Day. Ever!`
+"**{exclaim}**!" I screamed, as we did a triple loop-de-loop. Best. Day. Ever!`
             },
             {
                 title: "The Vacation",
@@ -221,11 +220,11 @@ As we boarded, I felt my {bodypart} start to shake. The ride began {verb1} faste
                     { label: "Exclamation", id: "exclaim" },
                     { label: "Number", id: "number" }
                 ],
-                template: `My vacation to {place} was supposed to be relaxing, but things got {adj1} very quickly!
+                template: `My vacation to **{place}** was supposed to be relaxing, but things got **{adj1}** very quickly!
 
-On day one, I tried to {verb1} on the beach, but a wild {animal} stole my sunscreen and ran away! I chased it using only my {bodypart} to dig through the sand.
+On day one, I tried to **{verb1}** on the beach, but a wild **{animal}** stole my sunscreen and ran away! I chased it using only my **{bodypart}** to dig through the sand.
 
-Exhausted, I stopped at a food stand and ordered some {food1}. The vendor looked at me and said, "{exclaim}! That'll be ${number} please!"
+Exhausted, I stopped at a food stand and ordered some **{food1}**. The vendor looked at me and said, "**{exclaim}**! That'll be ${number} please!"
 
 I went home with a sunburn, no money, and a story I'll never forget!`
             },
@@ -243,13 +242,13 @@ I went home with a sunburn, no money, and a story I'll never forget!`
                     { label: "Exclamation", id: "exclaim" },
                     { label: "Number", id: "number" }
                 ],
-                template: `I finally got tickets to the biggest {genre} concert of the year! The arena was {adj1} and packed with fans.
+                template: `I finally got tickets to the biggest **{genre}** concert of the year! The arena was **{adj1}** and packed with fans.
 
-When the show started, I was {verb1} so hard that I accidentally hit the person next to me with my {bodypart}. They turned around and it was {celebrity}!
+When the show started, I was **{verb1}** so hard that I accidentally hit the person next to me with my **{bodypart}**. They turned around and it was **{celebrity}**!
 
-"Sorry!" I yelled over the music. They just laughed and handed me their {food1}.
+"Sorry!" I yelled over the music. They just laughed and handed me their **{food1}**.
 
-Best concert ever! I sang along to all {number} songs, even though I only knew the words to one!`
+Best concert ever! I sang along to all **{number}** songs, even though I only knew the words to one!`
             }
         ];
 
@@ -289,6 +288,7 @@ Best concert ever! I sang along to all {number} songs, even though I only knew t
             const story = stories[currentStoryIndex];
             let resultText = story.template;
             let allFilled = true;
+            let filledValues = {};
 
             story.words.forEach(word => {
                 const value = document.getElementById(word.id).value.trim();
@@ -296,7 +296,7 @@ Best concert ever! I sang along to all {number} songs, even though I only knew t
                     allFilled = false;
                     return;
                 }
-                resultText = resultText.replace(new RegExp(`{${word.id}}`, 'g'), `<span class="filled-word">${value}</span>`);
+                filledValues[word.id] = value;
             });
 
             if (!allFilled) {
@@ -304,9 +304,15 @@ Best concert ever! I sang along to all {number} songs, even though I only knew t
                 return;
             }
 
+            // Replace placeholders with filled values
+            story.words.forEach(word => {
+                const regex = new RegExp(`\\*\\*\\{${word.id}\\}\\*\\*`, 'g');
+                resultText = resultText.replace(regex, `<span class="filled-word">${filledValues[word.id]}</span>`);
+            });
+
             document.getElementById('inputsSection').classList.remove('active');
             document.getElementById('resultSection').classList.add('active');
-            document.getElementById('storyResult').innerHTML = resultText.replace(/{number}/g, '3');
+            document.getElementById('storyResult').innerHTML = resultText.replace(/\{number\}/g, '<span class="filled-word">3</span>');
         }
 
         function copyStory() {

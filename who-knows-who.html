@@ -50,12 +50,6 @@
             background: #f0f0ff;
         }
 
-        .option-btn.selected {
-            background: #764ba2;
-            color: white;
-            border-color: #764ba2;
-        }
-
         .option-btn.correct {
             background: #28a745 !important;
             color: white !important;
@@ -129,35 +123,52 @@
             font-weight: 600;
         }
 
-        .feedback-text {
+        .feedback-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .feedback-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
             text-align: center;
-            font-size: 1.2rem;
+            max-width: 400px;
+            margin: 20px;
+        }
+
+        .feedback-emoji {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .feedback-text {
+            font-size: 1.3rem;
             font-weight: 600;
-            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-detail {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .continue-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
             border-radius: 10px;
-            margin: 15px 0;
-        }
-
-        .feedback-correct {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .feedback-wrong {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .answer-reveal {
-            background: #e7f3ff;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            border: 2px solid #007bff;
-        }
-
-        .answer-reveal strong {
-            color: #007bff;
+            font-size: 1rem;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -192,15 +203,6 @@
                 <div class="question-text" id="questionText"></div>
                 <div class="options-container" id="optionsContainer"></div>
             </div>
-
-            <div class="feedback-text" id="feedbackText" style="display: none;"></div>
-            
-            <div class="answer-reveal" id="answerReveal" style="display: none;">
-                <strong id="revealText"></strong>
-            </div>
-
-            <button class="btn" onclick="submitAnswer()" id="submitBtn" style="display: none;">Submit Answer</button>
-            <button class="btn" onclick="nextQuestion()" id="nextBtn" style="display: none;">Continue</button>
         </div>
 
         <!-- Results Section -->
@@ -215,6 +217,16 @@
             <div class="score-breakdown" id="scoreBreakdown"></div>
 
             <button class="btn" onclick="resetGame()" style="margin-top: 20px;">Play Again</button>
+        </div>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="feedback-content">
+            <div class="feedback-emoji" id="feedbackEmoji"></div>
+            <div class="feedback-text" id="feedbackMainText"></div>
+            <div class="feedback-detail" id="feedbackDetail"></div>
+            <button class="continue-btn" onclick="continueGame()">Continue</button>
         </div>
     </div>
 
@@ -267,7 +279,6 @@
         let player2Guesses = [];
         let player2Score = 0;
         let phase = 1;
-        let selectedOption = null;
 
         function startGame() {
             const name1 = document.getElementById('name1').value.trim();
@@ -312,7 +323,7 @@
             if (phase === 1) {
                 document.getElementById('questionText').textContent = `${name1}: ${q.question}`;
             } else {
-                document.getElementById('questionText').textContent = `${name2}: What did ${name1} choose for this question?`;
+                document.getElementById('questionText').textContent = `${name2}: What did ${name1} choose?`;
             }
 
             const optionsContainer = document.getElementById('optionsContainer');
@@ -322,84 +333,58 @@
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
                 btn.textContent = option;
-                btn.onclick = () => selectOption(index, btn);
+                btn.onclick = () => handleOptionClick(index);
                 optionsContainer.appendChild(btn);
             });
-
-            selectedOption = null;
-            document.getElementById('submitBtn').style.display = 'block';
-            document.getElementById('nextBtn').style.display = 'none';
-            document.getElementById('feedbackText').style.display = 'none';
-            document.getElementById('answerReveal').style.display = 'none';
-
-            // Disable options after selection in phase 2
-            if (phase === 2) {
-                optionsContainer.style.pointerEvents = 'none';
-            }
         }
 
-        function selectOption(index, btn) {
-            if (phase === 2) return; // Can't change answer in phase 2
-
-            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            selectedOption = index;
-        }
-
-        function submitAnswer() {
-            if (selectedOption === null) {
-                alert('Please select an answer!');
-                return;
-            }
-
+        function handleOptionClick(selectedIndex) {
             if (phase === 1) {
-                // Phase 1: Player 1 answers about themselves
-                player1Answers.push(selectedOption);
-                
-                // Show confirmation and move to next
-                document.getElementById('submitBtn').style.display = 'none';
-                document.getElementById('nextBtn').style.display = 'block';
-                document.getElementById('nextBtn').textContent = 'Next Question';
-                
-                // Clear selection for next question
-                document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-                selectedOption = null;
+                // Phase 1: Just save the answer and move on
+                player1Answers.push(selectedIndex);
+                nextQuestion();
             } else {
-                // Phase 2: Player 2 guesses, then reveal if correct
-                player2Guesses.push(selectedOption);
-                
+                // Phase 2: Check if correct and show feedback
+                player2Guesses.push(selectedIndex);
                 const correctAnswer = player1Answers[currentQuestion];
-                const isCorrect = selectedOption === correctAnswer;
-                
+                const isCorrect = selectedIndex === correctAnswer;
+
                 if (isCorrect) {
                     player2Score++;
                 }
 
-                // Highlight correct and wrong answers
-                const options = document.querySelectorAll('.option-btn');
-                options[correctAnswer].classList.add('correct');
-                if (!isCorrect) {
-                    options[selectedOption].classList.add('wrong');
-                }
-
-                // Show feedback
-                const name1 = document.getElementById('name1').value.trim();
-                const name2 = document.getElementById('name2').value.trim();
-                const feedbackEl = document.getElementById('feedbackText');
-                
-                feedbackEl.style.display = 'block';
-                feedbackEl.className = 'feedback-text ' + (isCorrect ? 'feedback-correct' : 'feedback-wrong');
-                feedbackEl.textContent = isCorrect 
-                    ? `✅ Correct! ${name2} knows ${name1} well!` 
-                    : `❌ Wrong! ${name1} chose "${questions[currentQuestion].options[correctAnswer]}"`;
-
-                document.getElementById('revealText').textContent = `${name1}'s answer: ${questions[currentQuestion].options[correctAnswer]}`;
-                document.getElementById('answerReveal').style.display = 'block';
-
-                document.getElementById('submitBtn').style.display = 'none';
-                document.getElementById('nextBtn').style.display = 'block';
-                document.getElementById('nextBtn').textContent = currentQuestion === questions.length - 1 ? 'See Results' : 'Next Question';
+                showFeedback(isCorrect, correctAnswer);
             }
+        }
+
+        function showFeedback(isCorrect, correctAnswer) {
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+            const q = questions[currentQuestion];
+
+            const overlay = document.getElementById('feedbackOverlay');
+            const emoji = document.getElementById('feedbackEmoji');
+            const mainText = document.getElementById('feedbackMainText');
+            const detail = document.getElementById('feedbackDetail');
+
+            if (isCorrect) {
+                emoji.textContent = '✅';
+                mainText.textContent = 'Correct!';
+                mainText.style.color = '#28a745';
+                detail.textContent = `${name2} knows ${name1} well!`;
+            } else {
+                emoji.textContent = '❌';
+                mainText.textContent = 'Wrong!';
+                mainText.style.color = '#dc3545';
+                detail.textContent = `${name1}'s answer was: ${q.options[correctAnswer]}`;
+            }
+
+            overlay.style.display = 'flex';
+        }
+
+        function continueGame() {
+            document.getElementById('feedbackOverlay').style.display = 'none';
+            nextQuestion();
         }
 
         function nextQuestion() {
@@ -430,24 +415,24 @@
             const name2 = document.getElementById('name2').value.trim();
 
             const percentage = Math.round((player2Score / questions.length) * 100);
-            
+
             document.getElementById('finalScore').textContent = `${player2Score}/${questions.length} (${percentage}%)`;
 
             let winnerText = '';
             let resultMessage = '';
-            
+
             if (percentage >= 80) {
                 winnerText = `🎉 ${name2} knows ${name1} REALLY well!`;
                 resultMessage = `Amazing! ${name2} got ${player2Score} out of ${questions.length} correct! You two must be best friends!`;
             } else if (percentage >= 60) {
                 winnerText = `😊 ${name2} knows ${name1} pretty well!`;
-                resultMessage = `Good job! ${name2} got ${player2Score} out of ${questions.length} correct. There's still more to learn about each other!`;
+                resultMessage = `Good job! ${name2} got ${player2Score} out of ${questions.length} correct.`;
             } else if (percentage >= 40) {
                 winnerText = `🤔 ${name2} is getting to know ${name1}...`;
-                resultMessage = `Not bad! ${name2} got ${player2Score} out of ${questions.length} correct. Keep spending time together!`;
+                resultMessage = `Not bad! ${name2} got ${player2Score} out of ${questions.length} correct.`;
             } else {
                 winnerText = `😅 ${name2} has a lot to learn about ${name1}!`;
-                resultMessage = `Oops! ${name2} only got ${player2Score} out of ${questions.length} correct. Time for more hangouts!`;
+                resultMessage = `Oops! ${name2} only got ${player2Score} out of ${questions.length} correct.`;
             }
 
             document.getElementById('winnerAnnouncement').textContent = winnerText;
