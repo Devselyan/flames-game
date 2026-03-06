@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Decoder</title>
+    <link rel="stylesheet" href="styles/shared.css">
+    <style>
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+        }
+
+        .cipher-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .cipher-btn {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .cipher-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            word-wrap: break-word;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .result-text {
+            font-size: 1.2rem;
+            font-family: monospace;
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .secret-key-input {
+            display: none;
+            margin: 15px 0;
+        }
+
+        .secret-key-input.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← Back to Games</a>
+
+        <h1>💌 Message Decoder</h1>
+        <p class="subtitle">Encode and decode secret messages with your friends!</p>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('encode')">🔐 Encode</button>
+            <button class="mode-btn" onclick="setMode('decode')">🔓 Decode</button>
+        </div>
+
+        <div class="input-group">
+            <label for="message">Your Message</label>
+            <textarea id="message" rows="4" placeholder="Enter your secret message here..."></textarea>
+        </div>
+
+        <label style="font-weight: 600; color: #333; display: block; margin-bottom: 10px;">Choose Cipher:</label>
+        <div class="cipher-selector">
+            <button class="cipher-btn active" onclick="setCipher('caesar')">Caesar</button>
+            <button class="cipher-btn" onclick="setCipher('reverse')">Reverse</button>
+            <button class="cipher-btn" onclick="setCipher('pigpen')">Pigpen Style</button>
+            <button class="cipher-btn" onclick="setCipher('binary')">Binary</button>
+            <button class="cipher-btn" onclick="setCipher('morse')">Morse Code</button>
+            <button class="cipher-btn" onclick="setCipher('atbash')">Atbash</button>
+        </div>
+
+        <div class="secret-key-input" id="keyInput">
+            <label for="shiftKey">Shift Number (1-25)</label>
+            <input type="number" id="shiftKey" min="1" max="25" value="3">
+        </div>
+
+        <button class="btn" onclick="processMessage()">Convert</button>
+
+        <div class="result-box" id="resultBox" style="display: none;">
+            <div class="result-label" id="resultLabel">Encoded Message:</div>
+            <div class="result-text" id="resultText"></div>
+            <div class="action-row">
+                <button class="action-btn" onclick="copyResult()">📋 Copy</button>
+                <button class="action-btn" onclick="swapMode()">🔄 Swap Mode</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #f8f8f8; border-radius: 15px;">
+            <h3 style="color: #764ba2; margin-bottom: 15px;">📖 Cipher Guide</h3>
+            <div id="cipherGuide">
+                <p><strong>Caesar Cipher:</strong> Shifts each letter by a fixed number. A→D with shift 3.</p>
+                <p><strong>Reverse:</strong> Reverses the entire message. "Hello" → "olleH"</p>
+                <p><strong>Pigpen Style:</strong> Replaces letters with symbols.</p>
+                <p><strong>Binary:</strong> Converts text to binary code (0s and 1s).</p>
+                <p><strong>Morse Code:</strong> Uses dots and dashes.</p>
+                <p><strong>Atbash:</strong> Reverses the alphabet. A→Z, B→Y, C→X.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'encode';
+        let currentCipher = 'caesar';
+
+        const morseCode = {
+            'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+            'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+            'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+            'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+            'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---',
+            '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...',
+            '8': '---..', '9': '----.', ' ': '/'
+        };
+
+        const reverseMorse = Object.fromEntries(Object.entries(morseCode).map(([k, v]) => [v, k]));
+
+        const pigpenSymbols = {
+            'A': '⌐', 'B': '⌑', 'C': '⌒', 'D': '⌓', 'E': '⌔', 'F': '⌕',
+            'G': '⌖', 'H': '⌗', 'I': '⌘', 'J': '⌙', 'K': '⌚', 'L': '⌛',
+            'M': '⌜', 'N': '⌝', 'O': '⌞', 'P': '⌟', 'Q': '⌠', 'R': '⌡',
+            'S': '◴', 'T': '◵', 'U': '◶', 'V': '◷', 'W': '◸', 'X': '◹',
+            'Y': '◺', 'Z': '◻'
+        };
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(mode));
+            });
+            document.getElementById('resultBox').style.display = 'none';
+        }
+
+        function setCipher(cipher) {
+            currentCipher = cipher;
+            document.querySelectorAll('.cipher-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(cipher.slice(0, 4)));
+            });
+            
+            const keyInput = document.getElementById('keyInput');
+            keyInput.classList.toggle('visible', cipher === 'caesar');
+        }
+
+        function caesar(str, shift, decode = false) {
+            if (decode) shift = 26 - shift;
+            return str.toUpperCase().split('').map(char => {
+                if (char >= 'A' && char <= 'Z') {
+                    return String.fromCharCode(((char.charCodeAt(0) - 65 + shift) % 26) + 65);
+                }
+                return char;
+            }).join('');
+        }
+
+        function atbash(str) {
+            return str.toUpperCase().split('').map(char => {
+                if (char >= 'A' && char <= 'Z') {
+                    return String.fromCharCode(90 - (char.charCodeAt(0) - 65));
+                }
+                return char;
+            }).join('');
+        }
+
+        function toBinary(str) {
+            return str.split('').map(char => {
+                return char.charCodeAt(0).toString(2).padStart(8, '0');
+            }).join(' ');
+        }
+
+        function fromBinary(str) {
+            return str.split(' ').map(bin => {
+                return String.fromCharCode(parseInt(bin, 2));
+            }).join('');
+        }
+
+        function toMorse(str) {
+            return str.toUpperCase().split('').map(char => {
+                return morseCode[char] || char;
+            }).join(' ');
+        }
+
+        function fromMorse(str) {
+            return str.split(' ').map(code => {
+                return reverseMorse[code] || '';
+            }).join('');
+        }
+
+        function processMessage() {
+            const message = document.getElementById('message').value;
+            
+            if (!message) {
+                alert('Please enter a message!');
+                return;
+            }
+
+            let result = '';
+
+            if (currentMode === 'encode') {
+                switch (currentCipher) {
+                    case 'caesar':
+                        result = caesar(message, parseInt(document.getElementById('shiftKey').value));
+                        break;
+                    case 'reverse':
+                        result = message.split('').reverse().join('');
+                        break;
+                    case 'pigpen':
+                        result = message.toUpperCase().split('').map(c => pigpenSymbols[c] || c).join('');
+                        break;
+                    case 'binary':
+                        result = toBinary(message);
+                        break;
+                    case 'morse':
+                        result = toMorse(message);
+                        break;
+                    case 'atbash':
+                        result = atbash(message);
+                        break;
+                }
+            } else {
+                switch (currentCipher) {
+                    case 'caesar':
+                        result = caesar(message, parseInt(document.getElementById('shiftKey').value), true);
+                        break;
+                    case 'reverse':
+                        result = message.split('').reverse().join('');
+                        break;
+                    case 'pigpen':
+                        result = message.split('').map(c => {
+                            const found = Object.entries(pigpenSymbols).find(([k, v]) => v === c);
+                            return found ? found[0] : c;
+                        }).join('');
+                        break;
+                    case 'binary':
+                        result = fromBinary(message);
+                        break;
+                    case 'morse':
+                        result = fromMorse(message);
+                        break;
+                    case 'atbash':
+                        result = atbash(message);
+                        break;
+                }
+            }
+
+            document.getElementById('resultLabel').textContent = currentMode === 'encode' ? '🔐 Encoded Message:' : '🔓 Decoded Message:';
+            document.getElementById('resultText').textContent = result;
+            document.getElementById('resultBox').style.display = 'block';
+        }
+
+        function copyResult() {
+            const text = document.getElementById('resultText').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+
+        function swapMode() {
+            const resultText = document.getElementById('resultText').textContent;
+            document.getElementById('message').value = resultText;
+            setMode(currentMode === 'encode' ? 'decode' : 'encode');
+            processMessage();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mad Libs</title>
+    <link rel="stylesheet" href="styles/shared.css">
+    <style>
+        .game-section {
+            display: none;
+        }
+
+        .game-section.active {
+            display: block;
+        }
+
+        .story-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .story-btn {
+            padding: 12px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .story-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .word-input {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .word-input label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .word-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .word-input input:focus {
+            outline: none;
+            border-color: #764ba2;
+        }
+
+        .story-result {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+            border: 2px solid #ffd700;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            line-height: 2;
+            font-size: 1.1rem;
+        }
+
+        .filled-word {
+            background: #ffd700;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .emoji-header {
+            font-size: 3rem;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← Back to Games</a>
+
+        <h1>📝 Mad Libs</h1>
+        <p class="subtitle">Fill in the blanks to create hilarious stories!</p>
+
+        <!-- Story Selection -->
+        <div id="selectionSection" class="game-section active">
+            <h3 style="text-align: center; color: #764ba2; margin-bottom: 15px;">Choose a Story:</h3>
+            <div class="story-selector">
+                <button class="story-btn active" onclick="selectStory(0)">🎬 The Movie Star</button>
+                <button class="story-btn" onclick="selectStory(1)">🍕 The Restaurant</button>
+                <button class="story-btn" onclick="selectStory(2)">🎢 The Theme Park</button>
+                <button class="story-btn" onclick="selectStory(3)">🏖️ The Vacation</button>
+                <button class="story-btn" onclick="selectStory(4)">🎤 The Concert</button>
+            </div>
+
+            <div class="emoji-header" id="storyEmoji">🎬</div>
+            <p id="storyDescription" style="text-align: center; color: #666; margin: 20px 0;">
+                Create a funny story about becoming a famous movie star!
+            </p>
+
+            <button class="btn" onclick="goToInputs()">Start Writing!</button>
+        </div>
+
+        <!-- Inputs Section -->
+        <div id="inputsSection" class="game-section">
+            <h3 style="color: #764ba2; margin-bottom: 15px;">Fill in the Words:</h3>
+            <div class="inputs-grid" id="inputsGrid"></div>
+            <button class="btn" onclick="generateStory()">Create Story!</button>
+            <button class="btn" onclick="backToSelection()" style="background: #f0f0f0; color: #333; margin-top: 10px;">Back</button>
+        </div>
+
+        <!-- Result Section -->
+        <div id="resultSection" class="game-section">
+            <h2 style="text-align: center; color: #764ba2;">Your Masterpiece!</h2>
+            <div class="story-result" id="storyResult"></div>
+            <button class="btn" onclick="copyStory()">📋 Copy Story</button>
+            <button class="btn" onclick="backToSelection()" style="background: #f0f0f0; color: #333; margin-top: 10px;">Create Another</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStoryIndex = 0;
+        let userInputs = {};
+
+        const stories = [
+            {
+                title: "The Movie Star",
+                emoji: "🎬",
+                description: "Create a funny story about becoming a famous movie star!",
+                words: [
+                    { label: "Adjective", id: "adj1" },
+                    { label: "Another Adjective", id: "adj2" },
+                    { label: "Type of Animal", id: "animal" },
+                    { label: "Famous Person", id: "celebrity" },
+                    { label: "Body Part", id: "bodypart" },
+                    { label: "Verb (ending in -ing)", id: "verb1" },
+                    { label: "Number", id: "number" },
+                    { label: "Food (plural)", id: "food" }
+                ],
+                template: `One day, I was walking down the street when suddenly a {adj1} limousine pulled up next to me. Out stepped {celebrity}, who said, "You're the most {adj2} person I've ever seen! Want to be in my next movie?"
+
+I was so shocked I dropped my {animal} on the ground! But {celebrity} just smiled and said, "Perfect! That's exactly the kind of {bodypart} we need for the role!"
+
+The next thing I knew, I was {verb1} in front of {number} cameras, eating {food} for dinner, and living the life of a true movie star!`
+            },
+            {
+                title: "The Restaurant",
+                emoji: "🍕",
+                description: "A dining experience you'll never forget!",
+                words: [
+                    { label: "Adjective", id: "adj1" },
+                    { label: "Type of Food", id: "food1" },
+                    { label: "Body Part", id: "bodypart" },
+                    { label: "Verb", id: "verb1" },
+                    { label: "Exclamation", id: "exclaim" },
+                    { label: "Famous Person", id: "celebrity" },
+                    { label: "Number", id: "number" },
+                    { label: "Liquid", id: "liquid" }
+                ],
+                template: `Last night, I went to the most {adj1} restaurant in town. The waiter asked what I wanted, and I said, "I'll have the {food1}, please!"
+
+When the dish arrived, it was moving! I called the waiter over and pointed at it with my {bodypart}. "What is this?!" I exclaimed.
+
+The waiter just smiled and said, "{exclaim}! That's our specialty! Even {celebrity} orders it {number} times a week!"
+
+I took a bite and immediately reached for my glass of {liquid}. Let's just say I won't be going back there anytime soon!`
+            },
+            {
+                title: "The Theme Park",
+                emoji: "🎢",
+                description: "The most extreme theme park adventure!",
+                words: [
+                    { label: "Adjective", id: "adj1" },
+                    { label: "Adjective", id: "adj2" },
+                    { label: "Body Part", id: "bodypart" },
+                    { label: "Verb (ending in -ing)", id: "verb1" },
+                    { label: "Type of Animal", id: "animal" },
+                    { label: "Famous Person", id: "celebrity" },
+                    { label: "Food", id: "food1" },
+                    { label: "Exclamation", id: "exclaim" }
+                ],
+                template: `Welcome to the most {adj1} theme park in the world! I was so excited to try the new roller coaster that I ate {number} {food1}s for breakfast.
+
+My friend said, "This ride is so {adj2}, they say {celebrity} threw up on it last week!"
+
+As we boarded, I felt my {bodypart} start to shake. The ride began {verb1} faster and faster! Suddenly, a {animal} appeared out of nowhere and started running alongside the track!
+
+"{exclaim}!" I screamed, as we did a triple loop-de-loop. Best. Day. Ever!`
+            },
+            {
+                title: "The Vacation",
+                emoji: "🏖️",
+                description: "A vacation gone hilariously wrong!",
+                words: [
+                    { label: "Place", id: "place" },
+                    { label: "Adjective", id: "adj1" },
+                    { label: "Verb", id: "verb1" },
+                    { label: "Type of Animal", id: "animal" },
+                    { label: "Body Part", id: "bodypart" },
+                    { label: "Food", id: "food1" },
+                    { label: "Exclamation", id: "exclaim" },
+                    { label: "Number", id: "number" }
+                ],
+                template: `My vacation to {place} was supposed to be relaxing, but things got {adj1} very quickly!
+
+On day one, I tried to {verb1} on the beach, but a wild {animal} stole my sunscreen and ran away! I chased it using only my {bodypart} to dig through the sand.
+
+Exhausted, I stopped at a food stand and ordered some {food1}. The vendor looked at me and said, "{exclaim}! That'll be ${number} please!"
+
+I went home with a sunburn, no money, and a story I'll never forget!`
+            },
+            {
+                title: "The Concert",
+                emoji: "🎤",
+                description: "The most epic concert experience!",
+                words: [
+                    { label: "Music Genre", id: "genre" },
+                    { label: "Adjective", id: "adj1" },
+                    { label: "Body Part", id: "bodypart" },
+                    { label: "Verb (ending in -ing)", id: "verb1" },
+                    { label: "Famous Person", id: "celebrity" },
+                    { label: "Food", id: "food1" },
+                    { label: "Exclamation", id: "exclaim" },
+                    { label: "Number", id: "number" }
+                ],
+                template: `I finally got tickets to the biggest {genre} concert of the year! The arena was {adj1} and packed with fans.
+
+When the show started, I was {verb1} so hard that I accidentally hit the person next to me with my {bodypart}. They turned around and it was {celebrity}!
+
+"Sorry!" I yelled over the music. They just laughed and handed me their {food1}.
+
+Best concert ever! I sang along to all {number} songs, even though I only knew the words to one!`
+            }
+        ];
+
+        function selectStory(index) {
+            currentStoryIndex = index;
+            document.querySelectorAll('.story-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+            document.getElementById('storyEmoji').textContent = stories[index].emoji;
+            document.getElementById('storyDescription').textContent = stories[index].description;
+        }
+
+        function goToInputs() {
+            document.getElementById('selectionSection').classList.remove('active');
+            document.getElementById('inputsSection').classList.add('active');
+
+            const story = stories[currentStoryIndex];
+            const grid = document.getElementById('inputsGrid');
+            grid.innerHTML = '';
+
+            story.words.forEach(word => {
+                grid.innerHTML += `
+                    <div class="word-input">
+                        <label>${word.label}</label>
+                        <input type="text" id="${word.id}" placeholder="Enter ${word.label.toLowerCase()}">
+                    </div>
+                `;
+            });
+        }
+
+        function backToSelection() {
+            document.querySelectorAll('.game-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById('selectionSection').classList.add('active');
+        }
+
+        function generateStory() {
+            const story = stories[currentStoryIndex];
+            let resultText = story.template;
+            let allFilled = true;
+
+            story.words.forEach(word => {
+                const value = document.getElementById(word.id).value.trim();
+                if (!value) {
+                    allFilled = false;
+                    return;
+                }
+                resultText = resultText.replace(new RegExp(`{${word.id}}`, 'g'), `<span class="filled-word">${value}</span>`);
+            });
+
+            if (!allFilled) {
+                alert('Please fill in all the words!');
+                return;
+            }
+
+            document.getElementById('inputsSection').classList.remove('active');
+            document.getElementById('resultSection').classList.add('active');
+            document.getElementById('storyResult').innerHTML = resultText.replace(/{number}/g, '3');
+        }
+
+        function copyStory() {
+            const text = document.getElementById('storyResult').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Story copied! Share the laughs! 😄');
+            });
+        }
+    </script>
+</body>
+</html>

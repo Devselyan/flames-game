@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliment Generator</title>
+    <link rel="stylesheet" href="styles/shared.css">
+    <style>
+        .compliment-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .compliment-card:hover {
+            transform: scale(1.02);
+        }
+
+        .compliment-emoji {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .compliment-text {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .compliment-name {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            opacity: 0.9;
+        }
+
+        .category-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+        }
+
+        .share-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .share-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .floating-hearts {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: float-up 2s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← Back to Games</a>
+
+        <h1>💬 Compliment Generator</h1>
+        <p class="subtitle">Spread positivity with heartfelt compliments!</p>
+
+        <div class="input-group">
+            <label for="friendName">Friend's Name</label>
+            <input type="text" id="friendName" placeholder="Enter your friend's name">
+        </div>
+
+        <label style="font-weight: 600; color: #333; display: block; margin-bottom: 10px;">Choose Category:</label>
+        <div class="category-selector">
+            <button class="category-btn active" onclick="setCategory('general')">✨ General</button>
+            <button class="category-btn" onclick="setCategory('friendship')">🤝 Friendship</button>
+            <button class="category-btn" onclick="setCategory('personality')">🌟 Personality</button>
+            <button class="category-btn" onclick="setCategory('funny')">😄 Funny</button>
+            <button class="category-btn" onclick="setCategory('support')">💪 Support</button>
+        </div>
+
+        <button class="btn generate-btn" onclick="generateCompliment()">Generate Compliment</button>
+
+        <div class="compliment-card" id="complimentCard" style="display: none;">
+            <div class="compliment-emoji" id="complimentEmoji">💖</div>
+            <div class="compliment-text" id="complimentText"></div>
+            <div class="compliment-name" id="complimentName"></div>
+        </div>
+
+        <div class="action-row" id="actionRow" style="display: none;">
+            <button class="action-btn share-btn" onclick="copyCompliment()">📋 Copy</button>
+            <button class="action-btn share-btn" onclick="generateCompliment()">🔄 Another</button>
+        </div>
+    </div>
+
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <script>
+        let currentCategory = 'general';
+
+        const compliments = {
+            general: [
+                { text: "You bring so much joy to everyone around you!", emoji: "🌟" },
+                { text: "Your positive energy is absolutely contagious!", emoji: "✨" },
+                { text: "You have a heart of gold and it shows in everything you do!", emoji: "💖" },
+                { text: "The world is a better place with you in it!", emoji: "🌍" },
+                { text: "You're capable of amazing things!", emoji: "⭐" },
+                { text: "Your smile can light up the darkest room!", emoji: "😊" },
+                { text: "You have such a beautiful soul!", emoji: "🦋" },
+                { text: "Your kindness makes a difference every single day!", emoji: "💕" },
+                { text: "You're stronger than you know and braver than you believe!", emoji: "🦁" },
+                { text: "Your unique perspective makes the world more interesting!", emoji: "🎨" }
+            ],
+            friendship: [
+                { text: "You're the kind of friend everyone wishes they had!", emoji: "🤝" },
+                { text: "Our friendship is one of my life's greatest treasures!", emoji: "💎" },
+                { text: "You always know how to make me laugh, even on the worst days!", emoji: "😂" },
+                { text: "I'm so grateful to have a friend as loyal as you!", emoji: "🐕" },
+                { text: "You're not just a friend, you're family!", emoji: "👨‍👩‍👧" },
+                { text: "Thank you for always being there, no matter what!", emoji: "🙏" },
+                { text: "You make every adventure more fun!", emoji: "🎉" },
+                { text: "Having you as a friend is like having a built-in cheerleader!", emoji: "📣" },
+                { text: "You're the peanut butter to my jelly!", emoji: "🥜" },
+                { text: "Friends like you are harder to find than a four-leaf clover!", emoji: "🍀" }
+            ],
+            personality: [
+                { text: "Your creativity knows no bounds!", emoji: "🎨" },
+                { text: "You have the most wonderful sense of humor!", emoji: "😄" },
+                { text: "Your intelligence is inspiring!", emoji: "🧠" },
+                { text: "You're so thoughtful and considerate!", emoji: "💭" },
+                { text: "Your passion for life is truly motivating!", emoji: "🔥" },
+                { text: "You have such a warm and welcoming presence!", emoji: "🏠" },
+                { text: "Your honesty is refreshing and admirable!", emoji: "💯" },
+                { text: "You're incredibly resilient and that's amazing!", emoji: "💪" },
+                { text: "Your curiosity makes you endlessly interesting!", emoji: "🔍" },
+                { text: "You have a natural gift for making others feel valued!", emoji: "🎁" }
+            ],
+            funny: [
+                { text: "You're like a human version of a golden retriever - everyone loves you!", emoji: "🐕" },
+                { text: "You're proof that awesome people actually exist!", emoji: "🦄" },
+                { text: "If you were a vegetable, you'd be a cute-cumber!", emoji: "🥒" },
+                { text: "You're more fun than a barrel of monkeys... and way cuter!", emoji: "🐒" },
+                { text: "You're the sprinkles on my donut!", emoji: "🍩" },
+                { text: "You're like WiFi for my soul - you just get me!", emoji: "📶" },
+                { text: "You're cooler than the other side of the pillow!", emoji: "🛏️" },
+                { text: "You're basically a superhero, but with better snacks!", emoji: "🦸" },
+                { text: "You're the reason I smile at my phone like an idiot!", emoji: "📱" },
+                { text: "You're more refreshing than a cold drink on a hot day!", emoji: "🥤" }
+            ],
+            support: [
+                { text: "I believe in you, even when you don't believe in yourself!", emoji: "💪" },
+                { text: "You've got this, and I've got you!", emoji: "🤗" },
+                { text: "Every challenge is just an opportunity for you to shine!", emoji: "⭐" },
+                { text: "You're handling this with so much grace and strength!", emoji: "🌸" },
+                { text: "Remember: you've survived 100% of your bad days so far!", emoji: "📊" },
+                { text: "Your comeback is going to be legendary!", emoji: "🏆" },
+                { text: "This tough time doesn't define you - your resilience does!", emoji: "💎" },
+                { text: "You're growing stronger with every challenge!", emoji: "🌱" },
+                { text: "I'm so proud of how far you've come!", emoji: "🎊" },
+                { text: "Better days are coming, and you'll be ready for them!", emoji: "🌅" }
+            ]
+        };
+
+        function setCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.onclick.toString().includes(category));
+            });
+        }
+
+        function generateCompliment() {
+            const friendName = document.getElementById('friendName').value.trim() || 'You';
+            const categoryCompliments = compliments[currentCategory];
+            const randomCompliment = categoryCompliments[Math.floor(Math.random() * categoryCompliments.length)];
+
+            document.getElementById('complimentEmoji').textContent = randomCompliment.emoji;
+            document.getElementById('complimentText').textContent = randomCompliment.text;
+            document.getElementById('complimentName').textContent = `— ${friendName}`;
+            
+            document.getElementById('complimentCard').style.display = 'flex';
+            document.getElementById('actionRow').style.display = 'flex';
+
+            createFloatingHearts();
+        }
+
+        function copyCompliment() {
+            const text = `${document.getElementById('complimentText').textContent} ${document.getElementById('complimentName').textContent}`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Compliment copied! Share the positivity! 💖');
+            });
+        }
+
+        function createFloatingHearts() {
+            const container = document.getElementById('floatingHearts');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 10; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = ['💖', '💕', '✨', '💗', '💝'][Math.floor(Math.random() * 5)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = Math.random() * 50 + 50 + 'vh';
+                heart.style.animationDelay = Math.random() * 0.5 + 's';
+                container.appendChild(heart);
+
+                setTimeout(() => heart.remove(), 2000);
+            }
+        }
+    </script>
+</body>
+</html>

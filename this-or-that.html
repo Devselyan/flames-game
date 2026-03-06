@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This or That</title>
+    <link rel="stylesheet" href="styles/shared.css">
+    <style>
+        .game-section {
+            display: none;
+        }
+
+        .game-section.active {
+            display: block;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .options-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            flex: 1;
+            min-width: 150px;
+            max-width: 200px;
+            padding: 25px 20px;
+            background: white;
+            color: #764ba2;
+            border: 3px solid transparent;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .option-btn.selected {
+            border-color: #ffd700;
+            background: #fff9e6;
+        }
+
+        .option-btn.answered {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results-container {
+            margin-top: 30px;
+        }
+
+        .match-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f8f8;
+            border-radius: 10px;
+        }
+
+        .match-row.match {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .match-row.mismatch {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+        }
+
+        .match-icon {
+            font-size: 1.5rem;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #764ba2;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .player-turn {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #764ba2;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← Back to Games</a>
+
+        <h1>🎯 This or That</h1>
+        <p class="subtitle">Pick your preferences and compare with your friend!</p>
+
+        <!-- Setup Section -->
+        <div id="setupSection" class="game-section active">
+            <div class="input-group">
+                <label for="name1">Player 1 Name</label>
+                <input type="text" id="name1" placeholder="Enter your name">
+            </div>
+
+            <div class="input-group">
+                <label for="name2">Player 2 Name</label>
+                <input type="text" id="name2" placeholder="Enter your friend's name">
+            </div>
+
+            <button class="btn" onclick="startGame()">Start Game</button>
+        </div>
+
+        <!-- Game Section -->
+        <div id="gameSection" class="game-section">
+            <div class="player-turn" id="playerTurn"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-text" id="questionText"></div>
+                <div class="options-row" id="optionsRow"></div>
+            </div>
+
+            <button class="btn" onclick="nextQuestion()" id="nextBtn" style="display: none; margin-top: 20px;">Next Question</button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="game-section">
+            <h2 style="text-align: center; color: #764ba2;">Results</h2>
+            <div class="score-display" id="scoreDisplay"></div>
+            <p id="resultMessage" style="text-align: center; color: #666;"></p>
+
+            <div class="results-container" id="resultsContainer"></div>
+
+            <button class="btn" onclick="resetGame()" style="margin-top: 20px;">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { option1: "🏖️ Beach", option2: "🏔️ Mountains" },
+            { option1: "🍕 Pizza", option2: "🍔 Burgers" },
+            { option1: "🌙 Night Owl", option2: "☀️ Early Bird" },
+            { option1: "📱 Texting", option2: "📞 Calling" },
+            { option1: "🎬 Movies", option2: "📺 TV Shows" },
+            { option1: "🎮 Video Games", option2: "📚 Reading" },
+            { option1: "🎉 Big Party", option2: "🏠 Quiet Night In" },
+            { option1: "✈️ Traveling", option2: "🏡 Staying Home" },
+            { option1: "🍦 Ice Cream", option2: "🍰 Cake" },
+            { option1: "☕ Coffee", option2: "🍵 Tea" },
+            { option1: "🎵 Pop Music", option2: "🎸 Rock Music" },
+            { option1: "🐶 Dogs", option2: "🐱 Cats" },
+            { option1: "🎨 Creating", option2: "🎭 Consuming" },
+            { option1: "🏃 Active", option2: "🛋️ Relaxed" },
+            { option1: "🎯 Planning", option2: "🎲 Spontaneous" },
+            { option1: "👥 Group Hangout", option2: "👤 One-on-One" },
+            { option1: "🍿 Sweet Snacks", option2: "🥨 Salty Snacks" },
+            { option1: "🌧️ Rainy Days", option2: "☀️ Sunny Days" },
+            { option1: "🎭 Comedy", option2: "😢 Drama" },
+            { option1: "💰 Saving", option2: "💳 Spending" }
+        ];
+
+        let currentQuestion = 0;
+        let player1Answers = [];
+        let player2Answers = [];
+        let currentPlayer = 1;
+
+        function startGame() {
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+
+            if (!name1 || !name2) {
+                alert('Please enter both names!');
+                return;
+            }
+
+            document.getElementById('setupSection').classList.remove('active');
+            document.getElementById('gameSection').classList.add('active');
+            
+            player1Answers = [];
+            player2Answers = [];
+            currentQuestion = 0;
+            currentPlayer = 1;
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+            const q = questions[currentQuestion];
+
+            document.getElementById('playerTurn').textContent = `${currentPlayer === 1 ? name1 : name2}'s turn`;
+            document.getElementById('questionText').textContent = `This or That?`;
+            document.getElementById('progressFill').style.width = `${((currentQuestion) / questions.length) * 100}%`;
+
+            const optionsRow = document.getElementById('optionsRow');
+            optionsRow.innerHTML = `
+                <button class="option-btn" onclick="selectOption(0)">${q.option1}</button>
+                <button class="option-btn" onclick="selectOption(1)">${q.option2}</button>
+            `;
+
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function selectOption(choice) {
+            if (currentPlayer === 1) {
+                player1Answers.push(choice);
+            } else {
+                player2Answers.push(choice);
+            }
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.add('answered');
+            });
+            document.querySelectorAll('.option-btn')[choice].classList.add('selected');
+
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+
+            if (currentQuestion >= questions.length) {
+                showResults();
+                return;
+            }
+
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            loadQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('gameSection').classList.remove('active');
+            document.getElementById('resultsSection').style.display = 'block';
+
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+
+            let matches = 0;
+            let resultsHtml = '';
+
+            for (let i = 0; i < questions.length; i++) {
+                const q = questions[i];
+                const p1Choice = player1Answers[i] === 0 ? q.option1 : q.option2;
+                const p2Choice = player2Answers[i] === 0 ? q.option1 : q.option2;
+                const isMatch = player1Answers[i] === player2Answers[i];
+
+                if (isMatch) matches++;
+
+                resultsHtml += `
+                    <div class="match-row ${isMatch ? 'match' : 'mismatch'}">
+                        <span>${q.option1.split(' ')[1]} or ${q.option2.split(' ')[1]}</span>
+                        <span>${name1}: ${p1Choice.split(' ')[1]}</span>
+                        <span>${name2}: ${p2Choice.split(' ')[1]}</span>
+                        <span class="match-icon">${isMatch ? '✅' : '❌'}</span>
+                    </div>
+                `;
+            }
+
+            const matchPercent = Math.round((matches / questions.length) * 100);
+            document.getElementById('scoreDisplay').textContent = `${matches}/${questions.length} (${matchPercent}%)`;
+
+            let message = '';
+            if (matchPercent >= 80) message = `🎉 Amazing! You and ${name2} think alike!`;
+            else if (matchPercent >= 60) message = `😊 Great! You have a lot in common!`;
+            else if (matchPercent >= 40) message = `🤔 Interesting! You're different but that's cool!`;
+            else message = `😄 Opposites attract! Your differences make you unique!`;
+
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultsContainer').innerHTML = resultsHtml;
+        }
+
+        function resetGame() {
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('setupSection').classList.add('active');
+            document.getElementById('name1').value = '';
+            document.getElementById('name2').value = '';
+        }
+    </script>
+</body>
+</html>

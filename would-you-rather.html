@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Would You Rather</title>
+    <link rel="stylesheet" href="styles/shared.css">
+    <style>
+        .game-section {
+            display: none;
+        }
+
+        .game-section.active {
+            display: block;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .option-card {
+            background: white;
+            color: #333;
+            padding: 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .option-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .option-card.selected {
+            border-color: #ffd700;
+            background: #fff9e6;
+        }
+
+        .option-card.answered {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 15px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f12711;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .progress-indicator {
+            text-align: center;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .category-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+            color: white;
+        }
+
+        .results-summary {
+            background: #f8f8f8;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .match-highlight {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+
+        .nomatch-highlight {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← Back to Games</a>
+
+        <h1>🎭 Would You Rather</h1>
+        <p class="subtitle">Make impossible choices and compare with your friend!</p>
+
+        <!-- Setup Section -->
+        <div id="setupSection" class="game-section active">
+            <div class="input-group">
+                <label for="name1">Player 1 Name</label>
+                <input type="text" id="name1" placeholder="Enter your name">
+            </div>
+
+            <div class="input-group">
+                <label for="name2">Player 2 Name</label>
+                <input type="text" id="name2" placeholder="Enter your friend's name">
+            </div>
+
+            <label style="font-weight: 600; color: #333; display: block; margin: 15px 0 10px;">Choose Category:</label>
+            <div class="category-selector">
+                <button class="category-btn active" onclick="setCategory('all')">🎲 All</button>
+                <button class="category-btn" onclick="setCategory('funny')">😂 Funny</button>
+                <button class="category-btn" onclick="setCategory('deep')">🤔 Deep</button>
+                <button class="category-btn" onclick="setCategory('gross')">🤢 Gross</button>
+                <button class="category-btn" onclick="setCategory('superpower')">🦸 Superpowers</button>
+            </div>
+
+            <button class="btn" onclick="startGame()">Start Game</button>
+        </div>
+
+        <!-- Game Section -->
+        <div id="gameSection" class="game-section">
+            <div class="progress-indicator" id="progressIndicator">Question 1 of 10</div>
+            
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number" id="player1Stat">0</div>
+                    <div class="stat-label" id="player1StatLabel">Player 1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="matchesStat">0</div>
+                    <div class="stat-label">Matches</div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-text" id="questionText"></div>
+                <div class="options-container" id="optionsContainer"></div>
+            </div>
+
+            <button class="btn" onclick="nextQuestion()" id="nextBtn" style="display: none; margin-top: 20px;">Next Question</button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="game-section">
+            <h2 style="text-align: center; color: #f12711;">Game Complete!</h2>
+            
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number" id="finalMatches">0</div>
+                    <div class="stat-label">Same Choices</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="finalDifferent">0</div>
+                    <div class="stat-label">Different Choices</div>
+                </div>
+            </div>
+
+            <p id="resultMessage" style="text-align: center; font-size: 1.2rem; color: #666;"></p>
+
+            <div class="results-summary" id="resultsSummary"></div>
+
+            <button class="btn" onclick="resetGame()" style="margin-top: 20px;">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = 'all';
+        let currentQuestion = 0;
+        let player1Answers = [];
+        let player2Answers = [];
+        let currentPlayer = 1;
+        let currentQuestions = [];
+
+        const questions = {
+            funny: [
+                { q: "Would you rather have spaghetti for hair or sweat maple syrup?", a: "Spaghetti hair", b: "Maple syrup sweat" },
+                { q: "Would you rather always smell like garlic or always have wet socks?", a: "Smell like garlic", b: "Wet socks" },
+                { q: "Would you rather fight one horse-sized duck or 100 duck-sized horses?", a: "Horse-sized duck", b: "100 duck-sized horses" },
+                { q: "Would you rather have a nose that grows when you lie or ears that flap when you're happy?", a: "Growing nose", b: "Flapping ears" },
+                { q: "Would you rather only be able to whisper or only be able to shout?", a: "Only whisper", b: "Only shout" },
+                { q: "Would you rather have fingers as long as legs or legs as long as fingers?", a: "Finger legs", b: "Leg fingers" },
+                { q: "Would you rather eat a bowl of spiders or a bowl of lizards?", a: "Bowl of spiders", b: "Bowl of lizards" },
+                { q: "Would you rather have a pet rock that judges you or a pet cloud that rains on you?", a: "Judgy rock", b: "Raining cloud" },
+                { q: "Would you rather always have a song stuck in your head or always have an itch you can't scratch?", a: "Song stuck", b: "Can't scratch itch" },
+                { q: "Would you rather speak in rhymes or speak in song lyrics?", a: "Speak in rhymes", b: "Speak in lyrics" }
+            ],
+            deep: [
+                { q: "Would you rather be loved or respected?", a: "Be loved", b: "Be respected" },
+                { q: "Would you rather know when you die or how you die?", a: "When I die", b: "How I die" },
+                { q: "Would you rather change the past or see the future?", a: "Change past", b: "See future" },
+                { q: "Would you rather have unlimited money but no friends or limited money but amazing friends?", a: "Unlimited money", b: "Amazing friends" },
+                { q: "Would you rather be the funniest person in the room or the smartest?", a: "Funniest", b: "Smartest" },
+                { q: "Would you rather lose all your memories or never be able to make new ones?", a: "Lose memories", b: "No new memories" },
+                { q: "Would you rather be famous for something terrible or unknown for something amazing?", a: "Famous (terrible)", b: "Unknown (amazing)" },
+                { q: "Would you rather have a rewind button or a pause button for your life?", a: "Rewind button", b: "Pause button" },
+                { q: "Would you rather always tell the truth or always believe others?", a: "Always truth", b: "Always believe" },
+                { q: "Would you rather live in the past or the future?", a: "Live in past", b: "Live in future" }
+            ],
+            gross: [
+                { q: "Would you rather pick your nose in public or eat your boogers in private?", a: "Pick nose (public)", b: "Eat boogers (private)" },
+                { q: "Would you rather never shower again or never brush your teeth again?", a: "Never shower", b: "Never brush teeth" },
+                { q: "Would you rather drink a glass of sweat or a glass of tears?", a: "Glass of sweat", b: "Glass of tears" },
+                { q: "Would you rather have bad breath or smelly feet?", a: "Bad breath", b: "Smelly feet" },
+                { q: "Would you rather eat food off a dirty toilet seat or lick a public doorknob?", a: "Toilet seat food", b: "Lick doorknob" },
+                { q: "Would you rather have dandruff everywhere or always have food in your teeth?", a: "Dandruff", b: "Food in teeth" },
+                { q: "Would you rather burp loudly every time you speak or fart every time you sit?", a: "Loud burps", b: "Fart when sitting" },
+                { q: "Would you rather eat a bug or eat moldy bread?", a: "Eat a bug", b: "Eat moldy bread" },
+                { q: "Would you rather have permanently sweaty palms or permanently runny nose?", a: "Sweaty palms", b: "Runny nose" },
+                { q: "Would you rather use a toilet that never flushes or a toothbrush used by a stranger?", a: "Never flush", b: "Stranger's toothbrush" }
+            ],
+            superpower: [
+                { q: "Would you rather be able to fly or be invisible?", a: "Fly", b: "Be invisible" },
+                { q: "Would you rather read minds or see the future?", a: "Read minds", b: "See future" },
+                { q: "Would you rather teleport anywhere or travel through time?", a: "Teleport", b: "Time travel" },
+                { q: "Would you rather breathe underwater or survive in space?", a: "Breathe underwater", b: "Survive in space" },
+                { q: "Would you rather have super strength or super speed?", a: "Super strength", b: "Super speed" },
+                { q: "Would you rather be able to talk to animals or speak all human languages?", a: "Talk to animals", b: "All languages" },
+                { q: "Would you rather never get tired or never feel pain?", a: "Never tired", b: "Never feel pain" },
+                { q: "Would you rather control fire or control water?", a: "Control fire", b: "Control water" },
+                { q: "Would you rather shrink to ant size or grow to giant size?", a: "Shrink small", b: "Grow giant" },
+                { q: "Would you rather heal others or heal yourself?", a: "Heal others", b: "Heal myself" }
+            ]
+        };
+
+        function setCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.onclick.toString().includes(category));
+            });
+        }
+
+        function getQuestions() {
+            if (currentCategory === 'all') {
+                const all = [...questions.funny, ...questions.deep, ...questions.gross, ...questions.superpower];
+                return shuffleArray(all).slice(0, 10);
+            }
+            return shuffleArray([...questions[currentCategory]]).slice(0, 10);
+        }
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startGame() {
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+
+            if (!name1 || !name2) {
+                alert('Please enter both names!');
+                return;
+            }
+
+            document.getElementById('player1StatLabel').textContent = name1;
+            
+            currentQuestions = getQuestions();
+            currentQuestion = 0;
+            player1Answers = [];
+            player2Answers = [];
+            currentPlayer = 1;
+
+            document.getElementById('setupSection').classList.remove('active');
+            document.getElementById('gameSection').classList.add('active');
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+            const q = currentQuestions[currentQuestion];
+
+            document.getElementById('progressIndicator').textContent = `Question ${currentQuestion + 1} of 10 - ${currentPlayer === 1 ? name1 : name2}'s turn`;
+            document.getElementById('questionText').textContent = q.q;
+            document.getElementById('optionsContainer').innerHTML = `
+                <div class="option-card" onclick="selectOption(0)">${q.a}</div>
+                <div class="option-card" onclick="selectOption(1)">${q.b}</div>
+            `;
+
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        function selectOption(choice) {
+            if (currentPlayer === 1) {
+                player1Answers.push(choice);
+            } else {
+                player2Answers.push(choice);
+            }
+
+            document.querySelectorAll('.option-card').forEach((card, i) => {
+                card.classList.add('answered');
+                if (i === choice) card.classList.add('selected');
+            });
+
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+
+            // Update matches count
+            let matches = 0;
+            for (let i = 0; i < Math.min(player1Answers.length, player2Answers.length); i++) {
+                if (player1Answers[i] === player2Answers[i]) matches++;
+            }
+            document.getElementById('matchesStat').textContent = matches;
+
+            if (currentQuestion >= currentQuestions.length) {
+                showResults();
+                return;
+            }
+
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            loadQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('gameSection').classList.remove('active');
+            document.getElementById('resultsSection').style.display = 'block';
+
+            const name1 = document.getElementById('name1').value.trim();
+            const name2 = document.getElementById('name2').value.trim();
+
+            let matches = 0;
+            let summaryHtml = '<h3 style="color: #f12711; margin-bottom: 15px;">Question Breakdown:</h3>';
+
+            for (let i = 0; i < currentQuestions.length; i++) {
+                const q = currentQuestions[i];
+                const p1Choice = player1Answers[i] === 0 ? q.a : q.b;
+                const p2Choice = player2Answers[i] === 0 ? q.a : q.b;
+                const isMatch = player1Answers[i] === player2Answers[i];
+
+                if (isMatch) matches++;
+
+                summaryHtml += `
+                    <div class="result-item ${isMatch ? 'match-highlight' : 'nomatch-highlight'}">
+                        <span style="flex: 2;">${q.q}</span>
+                        <span style="flex: 1; font-size: 0.85rem;">${name1}: ${p1Choice}</span>
+                        <span style="flex: 1; font-size: 0.85rem;">${name2}: ${p2Choice}</span>
+                        <span>${isMatch ? '✅' : '❌'}</span>
+                    </div>
+                `;
+            }
+
+            document.getElementById('finalMatches').textContent = matches;
+            document.getElementById('finalDifferent').textContent = 10 - matches;
+
+            const matchPercent = Math.round((matches / 10) * 100);
+            let message = '';
+            if (matchPercent >= 80) message = `🎉 Wow! You and ${name2} think almost identically!`;
+            else if (matchPercent >= 60) message = `😊 Great! You have a lot in common with ${name2}!`;
+            else if (matchPercent >= 40) message = `🤔 Interesting! You two have different perspectives!`;
+            else message = `😄 Opposites attract! Your differences make you unique!`;
+
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultsSummary').innerHTML = summaryHtml;
+        }
+
+        function resetGame() {
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('setupSection').classList.add('active');
+            document.getElementById('name1').value = '';
+            document.getElementById('name2').value = '';
+        }
+    </script>
+</body>
+</html>
