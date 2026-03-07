@@ -3,175 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fun Games Hub</title>
-    <link rel="stylesheet" href="styles/shared.css">
+    <title>💕 Friend Games Collection</title>
     <style>
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+            overflow-x: hidden;
         }
-
-        header {
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        h1 {
             text-align: center;
-            color: white;
+            font-size: 3.5em;
+            margin: 30px 0 10px;
+            background: linear-gradient(45deg, #fff, #f1c40f, #ff6b6b, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+            text-shadow: 0 0 30px rgba(255,255,255,0.3);
+        }
+        @keyframes shimmer {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.3em;
             margin-bottom: 50px;
-        }
-
-        header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        header p {
-            font-size: 1.2rem;
             opacity: 0.9;
         }
-
+        
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            padding: 20px;
+            gap: 25px;
+            margin: 40px 0;
         }
-
+        
         .game-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 35px 25px;
             text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
             text-decoration: none;
-            color: inherit;
-            display: block;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
         }
-
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: 0.6s;
+        }
+        .game-card:hover::before { left: 100%; }
         .game-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.4);
         }
-
-        .game-icon {
-            font-size: 4rem;
+        .game-card .icon {
+            font-size: 4.5em;
+            display: block;
             margin-bottom: 20px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
         }
-
         .game-card h2 {
-            color: #764ba2;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
+            font-size: 1.6em;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
-
         .game-card p {
-            color: #666;
+            font-size: 0.95em;
+            opacity: 0.85;
             line-height: 1.6;
-            font-size: 0.95rem;
         }
-
-        .game-tag {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-top: 15px;
-        }
-
-        footer {
+        
+        /* Different card gradients */
+        .game-card.flames { background: linear-gradient(135deg, rgba(231,76,60,0.4), rgba(192,57,43,0.4)); }
+        .game-card.love { background: linear-gradient(135deg, rgba(255,107,107,0.4), rgba(255,195,113,0.4)); }
+        .game-card.tarot { background: linear-gradient(135deg, rgba(108,92,231,0.4), rgba(150,111,255,0.4)); }
+        .game-card.compliment { background: linear-gradient(135deg, rgba(46,204,113,0.4), rgba(109,213,211,0.4)); }
+        .game-card.would-you { background: linear-gradient(135deg, rgba(253,121,168,0.4), rgba(255,183,178,0.4)); }
+        .game-card.this-or-that { background: linear-gradient(135deg, rgba(116,185,255,0.4), rgba(162,155,254,0.4)); }
+        .game-card.who-knows { background: linear-gradient(135deg, rgba(255,195,113,0.4), rgba(255,154,158,0.4)); }
+        .game-card.mad-libs { background: linear-gradient(135deg, rgba(150,111,255,0.4), rgba(255,118,117,0.4)); }
+        .game-card.message { background: linear-gradient(135deg, rgba(84,58,183,0.4), rgba(255,107,107,0.4)); }
+        .game-card.numerology { background: linear-gradient(135deg, rgba(255,206,135,0.4), rgba(255,159,243,0.4)); }
+        
+        .footer {
             text-align: center;
-            color: white;
-            margin-top: 50px;
-            padding: 20px;
+            margin-top: 60px;
+            padding: 30px;
             opacity: 0.8;
+            font-size: 0.9em;
+        }
+        
+        .sparkle {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle 2s ease-out forwards;
+        }
+        @keyframes sparkle {
+            0% { opacity: 1; transform: scale(0) translateY(0); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: scale(1) translateY(-100px); }
+        }
+        
+        /* Floating hearts background */
+        .heart-bg {
+            position: fixed;
+            font-size: 2em;
+            opacity: 0.1;
+            animation: float 15s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.1; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5em; }
+            .games-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+            .game-card .icon { font-size: 3.5em; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🎮 Fun Games Hub</h1>
-            <p>10 fun games to discover your relationships and have fun!</p>
-        </header>
-
+        <h1>💕 Friend Games</h1>
+        <p class="subtitle">Fun games to play with friends & discover things about each other! ✨</p>
+        
         <div class="games-grid">
-            <a href="flames.html" class="game-card">
-                <div class="game-icon">🔥</div>
+            <a href="flames.html" class="game-card flames">
+                <span class="icon">🔥</span>
                 <h2>FLAMES</h2>
-                <p>The classic relationship compatibility game. Enter two names and discover if you're Friends, Lovers, Affectionate, Married, Enemies, or Siblings!</p>
-                <span class="game-tag">Classic Game</span>
+                <p>Discover your relationship status with friends! Friends, Lovers, Affection, Marriage, Enemies, or Siblings?</p>
             </a>
-
-            <a href="love-calculator.html" class="game-card">
-                <div class="game-icon">💕</div>
+            
+            <a href="love-calculator.html" class="game-card love">
+                <span class="icon">💖</span>
                 <h2>Love Calculator</h2>
-                <p>Calculate your love percentage! Find out how compatible you and your crush are with a fun percentage-based calculation.</p>
-                <span class="game-tag">Percentage Match</span>
+                <p>Calculate the love percentage between any two names. Are they your perfect match?</p>
             </a>
-
-            <a href="numerology.html" class="game-card">
-                <div class="game-icon">🔢</div>
-                <h2>Name Numerology</h2>
-                <p>Discover the hidden meaning in your names. Calculate life path numbers and see your numerical compatibility.</p>
-                <span class="game-tag">Mystical</span>
+            
+            <a href="tarot.html" class="game-card tarot">
+                <span class="icon">🔮</span>
+                <h2>Tarot Reading</h2>
+                <p>Get mystical tarot card readings. Discover what the cards reveal about your future!</p>
             </a>
-
-            <a href="tarot.html" class="game-card">
-                <div class="game-icon">🔮</div>
-                <h2>Friendship Tarot</h2>
-                <p>Draw tarot cards to reveal insights about your friendships. Get mystical guidance about your platonic relationships.</p>
-                <span class="game-tag">Fortune Telling</span>
-            </a>
-
-            <a href="who-knows-who.html" class="game-card">
-                <div class="game-icon">🤔</div>
-                <h2>Who Knows Who Better?</h2>
-                <p>Test how well you and your friend know each other! Answer questions and compare results to see who knows who better.</p>
-                <span class="game-tag">Quiz Game</span>
-            </a>
-
-            <a href="this-or-that.html" class="game-card">
-                <div class="game-icon">🎯</div>
-                <h2>This or That</h2>
-                <p>Pick your preferences and compare with your friend! See how much you have in common with 20 fun questions.</p>
-                <span class="game-tag">Choice Game</span>
-            </a>
-
-            <a href="would-you-rather.html" class="game-card">
-                <div class="game-icon">🎭</div>
-                <h2>Would You Rather</h2>
-                <p>Make impossible choices! Funny, deep, and gross scenarios to test your friendship compatibility.</p>
-                <span class="game-tag">Decision Game</span>
-            </a>
-
-            <a href="message-decoder.html" class="game-card">
-                <div class="game-icon">💌</div>
-                <h2>Message Decoder</h2>
-                <p>Encode and decode secret messages with ciphers like Caesar, Morse Code, Binary, and more!</p>
-                <span class="game-tag">Secret Codes</span>
-            </a>
-
-            <a href="compliment-generator.html" class="game-card">
-                <div class="game-icon">💬</div>
+            
+            <a href="compliment-generator.html" class="game-card compliment">
+                <span class="icon">💌</span>
                 <h2>Compliment Generator</h2>
-                <p>Spread positivity! Generate heartfelt, funny, and supportive compliments for your friends.</p>
-                <span class="game-tag">Positivity</span>
+                <p>Generate heartfelt compliments to brighten someone's day. Spread the positivity!</p>
             </a>
-
-            <a href="mad-libs.html" class="game-card">
-                <div class="game-icon">📝</div>
+            
+            <a href="would-you-rather.html" class="game-card would-you">
+                <span class="icon">🤔</span>
+                <h2>Would You Rather</h2>
+                <p>Answer hilarious and thought-provoking "Would You Rather" questions. Great for parties!</p>
+            </a>
+            
+            <a href="this-or-that.html" class="game-card this-or-that">
+                <span class="icon">⚖️</span>
+                <h2>This or That</h2>
+                <p>Choose between two options and see how your friends would respond. Discover preferences!</p>
+            </a>
+            
+            <a href="who-knows-who.html" class="game-card who-knows">
+                <span class="icon">👥</span>
+                <h2>Who Knows Who Best?</h2>
+                <p>Test how well you and your friends know each other. The ultimate friendship quiz!</p>
+            </a>
+            
+            <a href="mad-libs.html" class="game-card mad-libs">
+                <span class="icon">📝</span>
                 <h2>Mad Libs</h2>
-                <p>Fill in the blanks to create hilarious stories! Choose from movie stars, restaurants, vacations, and more.</p>
-                <span class="game-tag">Word Game</span>
+                <p>Create hilarious stories by filling in blanks with random words. Comedy guaranteed!</p>
+            </a>
+            
+            <a href="message-decoder.html" class="game-card message">
+                <span class="icon">🕵️</span>
+                <h2>Message Decoder</h2>
+                <p>Encode secret messages and decode them. Perfect for passing notes secretly!</p>
+            </a>
+            
+            <a href="numerology.html" class="game-card numerology">
+                <span class="icon">🔢</span>
+                <h2>Numerology</h2>
+                <p>Discover the mystical meaning behind numbers. What does your birth number reveal?</p>
             </a>
         </div>
-
-        <footer>
-            <p>Made with ❤️ | Have fun playing!</p>
-        </footer>
+        
+        <div class="footer">
+            <p>✨ Made with 💜 for fun times with friends ✨</p>
+            <p style="margin-top: 15px; opacity: 0.6;">Click any card to start playing!</p>
+        </div>
     </div>
-    
-    <script src="scripts/utils.js"></script>
+
+    <script>
+        // Create floating hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart-bg';
+            heart.textContent = ['💕', '💖', '💗', '💓', '💞'][Math.floor(Math.random() * 5)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (10 + Math.random() * 10) + 's';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 20000);
+        }
+        
+        setInterval(createHeart, 2000);
+        
+        // Create sparkles on click
+        document.addEventListener('click', (e) => {
+            for (let i = 0; i < 5; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = e.clientX + (Math.random() - 0.5) * 50 + 'px';
+                sparkle.style.top = e.clientY + (Math.random() - 0.5) * 50 + 'px';
+                sparkle.style.animationDelay = (Math.random() * 0.2) + 's';
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 2000);
+            }
+        });
+        
+        // Add hover sound effect (optional)
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Could add subtle sound here
+            });
+        });
+    </script>
 </body>
 </html>

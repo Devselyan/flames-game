@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Games Hub</title>
+    <link rel="stylesheet" href="styles/shared.css">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .game-card h2 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .game-card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .game-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 15px;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Fun Games Hub</h1>
+            <p>10 fun games to discover your relationships and have fun!</p>
+        </header>
+
+        <div class="games-grid">
+            <a href="flames.html" class="game-card">
+                <div class="game-icon">🔥</div>
+                <h2>FLAMES</h2>
+                <p>The classic relationship compatibility game. Enter two names and discover if you're Friends, Lovers, Affectionate, Married, Enemies, or Siblings!</p>
+                <span class="game-tag">Classic Game</span>
+            </a>
+
+            <a href="love-calculator.html" class="game-card">
+                <div class="game-icon">💕</div>
+                <h2>Love Calculator</h2>
+                <p>Calculate your love percentage! Find out how compatible you and your crush are with a fun percentage-based calculation.</p>
+                <span class="game-tag">Percentage Match</span>
+            </a>
+
+            <a href="numerology.html" class="game-card">
+                <div class="game-icon">🔢</div>
+                <h2>Name Numerology</h2>
+                <p>Discover the hidden meaning in your names. Calculate life path numbers and see your numerical compatibility.</p>
+                <span class="game-tag">Mystical</span>
+            </a>
+
+            <a href="tarot.html" class="game-card">
+                <div class="game-icon">🔮</div>
+                <h2>Friendship Tarot</h2>
+                <p>Draw tarot cards to reveal insights about your friendships. Get mystical guidance about your platonic relationships.</p>
+                <span class="game-tag">Fortune Telling</span>
+            </a>
+
+            <a href="who-knows-who.html" class="game-card">
+                <div class="game-icon">🤔</div>
+                <h2>Who Knows Who Better?</h2>
+                <p>Test how well you and your friend know each other! Answer questions and compare results to see who knows who better.</p>
+                <span class="game-tag">Quiz Game</span>
+            </a>
+
+            <a href="this-or-that.html" class="game-card">
+                <div class="game-icon">🎯</div>
+                <h2>This or That</h2>
+                <p>Pick your preferences and compare with your friend! See how much you have in common with 20 fun questions.</p>
+                <span class="game-tag">Choice Game</span>
+            </a>
+
+            <a href="would-you-rather.html" class="game-card">
+                <div class="game-icon">🎭</div>
+                <h2>Would You Rather</h2>
+                <p>Make impossible choices! Funny, deep, and gross scenarios to test your friendship compatibility.</p>
+                <span class="game-tag">Decision Game</span>
+            </a>
+
+            <a href="message-decoder.html" class="game-card">
+                <div class="game-icon">💌</div>
+                <h2>Message Decoder</h2>
+                <p>Encode and decode secret messages with ciphers like Caesar, Morse Code, Binary, and more!</p>
+                <span class="game-tag">Secret Codes</span>
+            </a>
+
+            <a href="compliment-generator.html" class="game-card">
+                <div class="game-icon">💬</div>
+                <h2>Compliment Generator</h2>
+                <p>Spread positivity! Generate heartfelt, funny, and supportive compliments for your friends.</p>
+                <span class="game-tag">Positivity</span>
+            </a>
+
+            <a href="mad-libs.html" class="game-card">
+                <div class="game-icon">📝</div>
+                <h2>Mad Libs</h2>
+                <p>Fill in the blanks to create hilarious stories! Choose from movie stars, restaurants, vacations, and more.</p>
+                <span class="game-tag">Word Game</span>
+            </a>
+        </div>
+
+        <footer>
+            <p>Made with ❤️ | Have fun playing!</p>
+        </footer>
+    </div>
+    
+    <script src="scripts/utils.js"></script>
+</body>
+</html>
